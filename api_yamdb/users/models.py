@@ -1,3 +1,12 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-# Create your models here.
+roles = [
+    'user',
+    'moderator',
+    'admin',
+    'super_admin'
+]
+
+class CustomUser(AbstractUser):
+    role = models.SlugField("Роль", blank=True)
