@@ -19,7 +19,7 @@ def foo(dfasd:str):
     return a
 def foo(Люда:str):
     a=1
-    return a
+    return aлдтдцткудпцудле
     
 
 class GenreSerializer(serializers.ModelSerializer):
