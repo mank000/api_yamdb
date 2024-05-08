@@ -2,6 +2,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from api.views import (
+    UserViewSet,
     CategoryViewSet,
     CommentViewSet,
     GenreViewSet,
@@ -31,6 +32,11 @@ router_v1.register(
     r"titles/(?P<title_id>\d+)/reviews",
     ReviewViewSet,
     basename="reviews",
+)
+router_v1.register(
+    'users',
+    UserViewSet,
+    basename='users',
 )
 
 

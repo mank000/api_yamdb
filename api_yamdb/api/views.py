@@ -3,8 +3,13 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from rest_framework import permissions, status, viewsets
+
+
 from reviews.models import Category, Genre, Title, GenreTitle, Review, Comment
 from users.models import CustomUser
+from api.permissions import (
+    ChangeAdminOnly, StaffOrReadOnly, AuthorOrStaffOrReadOnly
+)
 from api.serializers import (
     UsersSerializer,
     CategorySerializer,
@@ -23,6 +28,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """Работа с пользователями."""
     queryset = CustomUser.objects.all()
     serializer_class = UsersSerializer
+    permission_classes = (ChangeAdminOnly,)
     search_fields = ("username",)
     lookup_field = "username"
     http_method_names = ['get', 'post', 'patch', 'delete']
@@ -49,6 +55,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = (StaffOrReadOnly,)
     search_fields = ("name",)
     lookup_field = "slug"
 
@@ -58,6 +65,7 @@ class GenreViewSet(viewsets.ModelViewSet):
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = (StaffOrReadOnly,)
     search_fields = ("name",)
     lookup_field = "slug"
 
@@ -67,6 +75,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
+    permission_classes = (StaffOrReadOnly,)
 
 
 class GenreTitleViewSet(viewsets.ModelViewSet):
@@ -74,6 +83,7 @@ class GenreTitleViewSet(viewsets.ModelViewSet):
 
     queryset = GenreTitle.objects.all()
     serializer_class = GenreTitleSerializer
+    permission_classes = (ChangeAdminOnly)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -81,6 +91,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = (AuthorOrStaffOrReadOnly,)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -88,6 +99,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    permission_classes = (AuthorOrStaffOrReadOnly,)
 
     def get_review(self):
         """Получаем отзыв для комментария."""
