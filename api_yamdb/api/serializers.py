@@ -7,25 +7,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ("id", "name", "slug")
-        4
-        5
-        66
-        5
-        66
-        7
-        7799
-def foo(dfasd:str):
-    a=1
-    return a
-def foo1(dfasd:str):
-    a=1
-    return a
-def foo(Люда:str):
-    a=1
-    return aлдтдцткудпцудле
-def foo(дубль2:str):
-    a=1
-    return a
+   
     
 def func(dfasd:str):
     asss=1
@@ -65,7 +47,6 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Комментария."""
-    "я здесь что-то буду делать"
     pub_date = serializers.DateTimeField(
         source="publishedmodel.pub_date", read_only=True
     )
