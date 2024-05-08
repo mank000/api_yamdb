@@ -36,26 +36,11 @@ class TitleAdmin(admin.ModelAdmin):
         "name",
         "year",
         "description",
-        "category",
-        "get_genre",
-        "count_reviews",
-        "get_rating"
+        "category"
     )
     list_filter = ("name",)
     search_fields = ("name",)
     empty_value_display = "пусто"
-
-    def get_genre(self, obj):
-        # реализация вашего метода для получения жанра
-        pass
-    
-    def count_reviews(self, obj):
-        # реализация вашего метода для подсчета отзывов
-        pass
-    
-    def get_rating(self, obj):
-        # реализация вашего метода для получения рейтинга
-        pass
 
 
 class ReviewAdmin(admin.ModelAdmin):
