@@ -1,7 +1,4 @@
-# api_yamdb
-api_yamdb
-# API Yatube
-
+Api_yamdb
 ### О проекте
 
 Данный проект является api-сервисом для проекта api_yamdb
