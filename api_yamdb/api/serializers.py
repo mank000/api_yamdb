@@ -50,6 +50,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Комментария."""
+    "я здесь что-то буду делать"
     pub_date = serializers.DateTimeField(
         source="publishedmodel.pub_date", read_only=True
     )
