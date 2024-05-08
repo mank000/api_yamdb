@@ -1,13 +1,14 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+
 class Role(models.Model):
     """Класс ролей."""
     ROLE_CHOICES = [
-        ('admin', 'Администратор'),
-        ('user', 'Пользователь'),
-        ('moderator', 'Модератор'),
-        ('super_admin', 'Суперпользователь')
+        ("admin", "Администратор"),
+        ("user", "Пользователь"),
+        ("moderator", "Модератор"),
+        ("super_admin", "Суперпользователь")
     ]
 
     name = models.CharField(max_length=20,
@@ -26,5 +27,5 @@ class CustomUser(AbstractUser):
     def save(self, *args, **kwargs):
         """Переопределяем метод save для автоматического присваивания user."""
         if not self.pk:
-            self.role = Role.objects.get(name='user')
+            self.role = Role.objects.get(name="user")
         super().save(*args, **kwargs)
