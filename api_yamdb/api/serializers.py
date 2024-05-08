@@ -3,10 +3,23 @@ from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
 from users.models import CustomUser
 
 
+
+class UsersSerializer(serializers.ModelSerializer):
+    """Сериализатор кастомной модели User."""
+    username = serializers.SlugField(max_length=150)
+    email = serializers.EmailField(max_length=254)
+
+    class Meta:
+        model = CustomUser
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio', 'role',
+        )
+        read_only_fields = ('username', 'email', 'role',)
+
+
 class AdminSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор работы администратора с доступом к ролям.
-    """
+    """Сериализатор администратора с доступом к ролям."""
     role = serializers.ChoiceField(
         choices=CustomUser.ROLE_CHOICES, required=False
         )
@@ -17,7 +30,6 @@ class AdminSerializer(serializers.ModelSerializer):
             'username', 'email', 'first_name',
             'last_name', 'bio', 'role',
         )
-
 
 
 class CategorySerializer(serializers.ModelSerializer):
