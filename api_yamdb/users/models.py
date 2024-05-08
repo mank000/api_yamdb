@@ -24,9 +24,6 @@ class CustomUser(AbstractUser):
                 'буквы, цифры и @, ., +, -, _ знаки'
             ),
         ],
-        error_messages={
-            'unique': "Такое имя уже существует!"
-        },
     )
 
     email = models.EmailField('E-mail',
