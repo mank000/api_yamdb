@@ -1,5 +1,23 @@
 from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
+from users.models import CustomUser
+
+
+class AdminSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор работы администратора с доступом к ролям.
+    """
+    role = serializers.ChoiceField(
+        choices=CustomUser.ROLE_CHOICES, required=False
+        )
+
+    class Meta:
+        model = CustomUser
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio', 'role',
+        )
+
 
 
 class CategorySerializer(serializers.ModelSerializer):
