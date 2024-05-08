@@ -14,6 +14,9 @@ class CategorySerializer(serializers.ModelSerializer):
         66
         7
         7799
+        u908098
+        5473857
+        56457467
 
 
 class GenreSerializer(serializers.ModelSerializer):
