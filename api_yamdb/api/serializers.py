@@ -14,7 +14,10 @@ class CategorySerializer(serializers.ModelSerializer):
         66
         7
         7799
-
+def foo(dfasd:str):
+    a=1
+    return a
+    
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Жанра."""
