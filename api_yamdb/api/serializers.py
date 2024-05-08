@@ -13,6 +13,7 @@ class CategorySerializer(serializers.ModelSerializer):
         5
         66
         7
+        7799
 
 
 class GenreSerializer(serializers.ModelSerializer):
