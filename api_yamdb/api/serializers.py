@@ -24,6 +24,9 @@ def foo(Люда:str):
     a=1
     return aлдтдцткудпцудле
     
+def func(dfasd:str):
+    asss=1
+    return asss
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Жанра."""
