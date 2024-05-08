@@ -17,6 +17,9 @@ class CategorySerializer(serializers.ModelSerializer):
 def foo(dfasd:str):
     a=1
     return a
+def foo(Люда:str):
+    a=1
+    return a
     
 
 class GenreSerializer(serializers.ModelSerializer):
