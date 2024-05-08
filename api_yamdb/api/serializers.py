@@ -7,6 +7,12 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ("id", "name", "slug")
+        4
+        5
+        66
+        5
+        66
+        7
 
 
 class GenreSerializer(serializers.ModelSerializer):
