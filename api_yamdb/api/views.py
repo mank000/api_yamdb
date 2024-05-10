@@ -11,6 +11,7 @@ from users.models import CustomUser
 from api.permissions import (
     ChangeAdminOnly, StaffOrReadOnly, AuthorOrStaffOrReadOnly
 )
+from api.mixins import ModelMixinSet
 from api.serializers import (
     UsersSerializer,
     CategorySerializer,
@@ -51,7 +52,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(ModelMixinSet):
     """Представление для работы с моделью категория."""
 
     queryset = Category.objects.all()
@@ -62,12 +63,13 @@ class CategoryViewSet(viewsets.ModelViewSet):
     lookup_field = "slug"
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(ModelMixinSet):
     """Представление для работы с моделью жанр."""
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (StaffOrReadOnly,)
+    filter_backends = (SearchFilter, )
     search_fields = ("name",)
     lookup_field = "slug"
 
