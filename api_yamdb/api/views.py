@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from rest_framework import permissions, status, viewsets
@@ -56,6 +57,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (StaffOrReadOnly,)
+    filter_backends = (SearchFilter, )
     search_fields = ("name",)
     lookup_field = "slug"
 
