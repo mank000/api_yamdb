@@ -49,6 +49,13 @@ class CustomUser(AbstractUser):
                             verbose_name="Роль"
                             )
 
+    confirmation_code = models.CharField(max_length=6,
+                                         default="",
+                                         blank=True,
+                                         null=True,
+                                         verbose_name="Код подтверждения"
+                                         )
+
     def save(self, *args, **kwargs):
         """Переопределяем метод save для автоматического присваивания роли."""
         if not self.pk:

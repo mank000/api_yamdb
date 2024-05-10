@@ -20,6 +20,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
     'reviews.apps.ReviewsConfig',
     'users.apps.UsersConfig',
     'api.apps.ApiConfig'
@@ -84,6 +86,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
 
 # Internationalization
 
@@ -97,6 +105,13 @@ USE_L10N = True
 
 USE_TZ = True
 
+# E-mail
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'kozmin_arti@mail.ru'
+EMAIL_HOST_PASSWORD = 'p1XfJHBWY8NqkqCpp64q'
 
 # Static files (CSS, JavaScript, Images)
 
