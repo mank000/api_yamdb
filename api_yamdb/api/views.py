@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.db.models import Avg
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
@@ -81,6 +82,9 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     permission_classes = (StaffOrReadOnly,)
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.annotate(rating=Avg('reviews_title__score'))
 
 class GenreTitleViewSet(viewsets.ModelViewSet):
     """Представление для работы с моделью произведение."""
@@ -88,6 +92,34 @@ class GenreTitleViewSet(viewsets.ModelViewSet):
     queryset = GenreTitle.objects.all()
     serializer_class = GenreTitleSerializer
     permission_classes = (ChangeAdminOnly)
+
+
+# class TitleViewSet(viewsets.ModelViewSet):
+#     """
+#     Получить список всех произведений.
+#     """
+
+#     queryset = Title.objects.all()
+#     filter_backends = (DjangoFilterBackend,)
+#     filterset_class = TitleFilter
+#     permission_classes = (StaffOrReadOnly,)
+#     serializer_class = TitleReciveSerializer
+
+#     def get_queryset(self):
+#         return Title.objects.annotate(rating=Avg('reviews_title__score'))
+
+#     def get_serializer_class(self):
+#         """
+#         Переопределяем метод get_serializer_class()
+#         для проверки какаяоперация REST
+#         была использована и возвращаем серриализаторы
+#         для записи и чтения.
+#         """
+#         if self.action in ['list', 'retrieve']:
+#             return TitleReciveSerializer
+#         return TitleCreateSerializer
+
+
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
