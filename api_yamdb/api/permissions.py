@@ -1,5 +1,4 @@
 from rest_framework import permissions
-from users.models import CustomUser
 
 
 class IamOrReadOnly(permissions.BasePermission):
@@ -50,4 +49,3 @@ class AuthorOrStaffOrReadOnly(permissions.BasePermission):
             or obj.author == request.user
             or request.user.role in ['moderator', 'admin']
         )
-    
