@@ -5,6 +5,11 @@ from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from rest_framework import permissions, status, viewsets
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.pagination import LimitOffsetPagination
+
 
 
 from reviews.models import Category, Genre, Title, GenreTitle, Review, Comment
@@ -14,9 +19,13 @@ from api.permissions import (
 )
 from api.mixins import ModelMixinSet
 from api.serializers import (
+    ActivationSerializer,
+    SignUpSerializer,
     UsersSerializer,
     CategorySerializer,
     GenreSerializer,
+    TitleReciveSerializer,
+    TitleCreateSerializer,
     TitleSerializer,
     GenreTitleSerializer,
     ReviewSerializer,
@@ -25,6 +34,45 @@ from api.serializers import (
 
 
 CustomUser = get_user_model()
+
+
+class SignUp(APIView):
+    """Регистрация."""
+
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        serializer = SignUpSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            user = CustomUser.objects.get_or_create(
+                username=serializer.validated_data['username'],
+                email=serializer.validated_data['email'],
+            )#[users.SIGN_UP_USER_INDEX]
+        except IntegrityError:
+            return Response(
+                'Имя пользователя или электронная почта занята.',
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        user.confirmation_code = send_mail_with_code(request.data)
+        user.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class Activation(APIView):
+    """Получение JWT-токена."""
+
+    permission_classes = (permissions.AllowAny,)
+
+    def post(self, request):
+        serializer = ActivationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = CustomUser.objects.get(
+            username=serializer.validated_data['username'])
+        token = get_tokens_for_user(user)
+        return Response({'token': token},
+                        status=status.HTTP_201_CREATED)
+
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -58,7 +106,7 @@ class CategoryViewSet(ModelMixinSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (StaffOrReadOnly,)
+    permission_classes = (AuthorOrStaffOrReadOnly,)
     filter_backends = (SearchFilter, )
     search_fields = ("name",)
     lookup_field = "slug"
@@ -69,55 +117,60 @@ class GenreViewSet(ModelMixinSet):
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (StaffOrReadOnly,)
+    permission_classes = (AuthorOrStaffOrReadOnly,)
     filter_backends = (SearchFilter, )
     search_fields = ("name",)
     lookup_field = "slug"
 
 
-class TitleViewSet(viewsets.ModelViewSet):
-    """Представление для работы с моделью титл."""
+# class TitleViewSet(viewsets.ModelViewSet):
+#     """Представление для работы с моделью титл."""
 
-    queryset = Title.objects.all()
-    serializer_class = TitleSerializer
-    permission_classes = (StaffOrReadOnly,)
+#     queryset = Title.objects.all()
+#     serializer_class = TitleSerializer
+#     permission_classes = (StaffOrReadOnly,)
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.annotate(rating=Avg('reviews_title__score'))
+    # def get_queryset(self):
+    #     queryset = super().get_queryset()
+    #     return queryset.annotate(rating=Avg('reviews_title__score'))
 
 class GenreTitleViewSet(viewsets.ModelViewSet):
     """Представление для работы с моделью произведение."""
 
-    queryset = GenreTitle.objects.all()
-    serializer_class = GenreTitleSerializer
-    permission_classes = (ChangeAdminOnly)
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = (StaffOrReadOnly,)
+    filter_backends = (SearchFilter,)
+    search_fields = ('name', )
+    lookup_field = 'slug'
 
 
-# class TitleViewSet(viewsets.ModelViewSet):
-#     """
-#     Получить список всех произведений.
-#     """
+class TitleViewSet(viewsets.ModelViewSet):
+    """
+    Получить список всех произведений.
+    """
 
-#     queryset = Title.objects.all()
-#     filter_backends = (DjangoFilterBackend,)
-#     filterset_class = TitleFilter
-#     permission_classes = (StaffOrReadOnly,)
-#     serializer_class = TitleReciveSerializer
+    queryset = Title.objects.all()
+    #filter_backends = (DjangoFilterBackend,)
+    #filterset_class = TitleFilter
 
-#     def get_queryset(self):
-#         return Title.objects.annotate(rating=Avg('reviews_title__score'))
+    permission_classes = (AuthorOrStaffOrReadOnly,)
+    serializer_class = TitleSerializer
+    pagination_class = LimitOffsetPagination
 
-#     def get_serializer_class(self):
-#         """
-#         Переопределяем метод get_serializer_class()
-#         для проверки какаяоперация REST
-#         была использована и возвращаем серриализаторы
-#         для записи и чтения.
-#         """
-#         if self.action in ['list', 'retrieve']:
-#             return TitleReciveSerializer
-#         return TitleCreateSerializer
+    def get_queryset(self):
+        return Title.objects.annotate(rating=Avg('reviews'))
+
+    def get_serializer_class(self):
+        """
+        Переопределяем метод get_serializer_class()
+        для проверки какаяоперация REST
+        была использована и возвращаем серриализаторы
+        для записи и чтения.
+        """
+        if self.action in ['list', 'retrieve']:
+            return TitleReciveSerializer
+        return TitleCreateSerializer
 
 
 

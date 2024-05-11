@@ -90,25 +90,27 @@ class AdminSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор для модели Категории."""
     class Meta:
+        exclude = ('id', )
         model = Category
-        fields = ("id", "name", "slug")
+        #fields = ("id", "name", "slug")
    
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Жанра."""
     class Meta:
         model = Genre
-        fields = ("id", "name", "slug")
+        exclude = ('id', )
+        #fields = ("name", "slug")
 
 
-# class TitleSerializer(serializers.ModelSerializer):
-#     genre = serializers.SlugRelatedField(
-#         slug_field='slug', queryset=Genre.objects.all(), many=True
-#     )
+class TitleSerializer(serializers.ModelSerializer):
+    genre = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Genre.objects.all(), many=True
+    )
 
-#     class Meta:
-#         model = Title
-#         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+    class Meta:
+        model = Title
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
 
 
 # class GenreTitleSerializer(serializers.ModelSerializer):
@@ -136,60 +138,60 @@ class GenreSerializer(serializers.ModelSerializer):
 #         fields = ("id", "name", "slug")
 
 
-class TitleSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Произведения."""
-    rating = serializers.FloatField()
-
-    class Meta:
-        model = Title
-        fields = ("id", "name", "year", "description", "genre", "category")
-
-
-# class TitleCreateSerializer(serializers.ModelSerializer):
-#     """
-#     Сериализатор создания произведений.
-#     """
-
-#     name = serializers.CharField(
-#         max_length=200,
-#     )
-#     category = serializers.SlugRelatedField(
-#         queryset=Category.objects.all(),
-#         slug_field='slug',
-#     )
-#     genre = serializers.SlugRelatedField(
-#         queryset=Genre.objects.all(),
-#         slug_field='slug',
-#         many=True,
-#     )
-
-#     class Meta:
-#         model = Title
-#         fields = (
-#             '__all__'
-#         )
-
-
-# class TitleReciveSerializer(serializers.ModelSerializer):
-#     """
-#     Сериализатор получения произведений.
-#     """
-
-#     category = CategorySerializer(
-#         read_only=True,
-#     )
-#     genre = GenreSerializer(
-#         many=True,
-#         read_only=True,
-#     )
+# class TitleSerializer(serializers.ModelSerializer):
+#     """Сериализатор для модели Произведения."""
 #     rating = serializers.FloatField()
 
 #     class Meta:
 #         model = Title
-#         fields = '__all__'
-#         read_only_fields = (
-#             'id', 'name', 'year', 'rating', 'description',
-#         )
+#         fields = ("id", "name", "year", "description", "genre", "category")
+
+
+class TitleCreateSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор создания произведений.
+    """
+
+    name = serializers.CharField(
+        max_length=200,
+    )
+    category = serializers.SlugRelatedField(
+        queryset=Category.objects.all(),
+        slug_field='slug',
+    )
+    genre = serializers.SlugRelatedField(
+        queryset=Genre.objects.all(),
+        slug_field='slug',
+        many=True,
+    )
+
+    class Meta:
+        model = Title
+        fields = (
+            '__all__'
+        )
+
+
+class TitleReciveSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор получения произведений.
+    """
+
+    category = CategorySerializer(
+        read_only=True,
+    )
+    genre = GenreSerializer(
+        many=True,
+        read_only=True,
+    )
+    rating = serializers.FloatField()
+
+    class Meta:
+        model = Title
+        fields = '__all__'
+        read_only_fields = (
+            'id', 'name', 'year', 'rating', 'description',
+        )
 
 
 
