@@ -52,16 +52,16 @@ class CustomUser(AbstractUser):
     confirmation_code = models.CharField(max_length=6,
                                          default="",
                                          blank=True,
-                                         null=True,
                                          verbose_name="Код подтверждения"
                                          )
 
-    def save(self, *args, **kwargs):
-        """Переопределяем метод save для автоматического присваивания роли."""
-        if not self.pk:
-            # Можно изменить значение по умолчанию для роли
-            self.role = "user"
-        super().save(*args, **kwargs)
+# TODO::при загрузке модели пользователь получает роль "user" ВСЕГДА! Сделать проверку, если указана роль, то присваевается указаннаяЮ ессли неиууказанная, то user
+    # def save(self, *args, **kwargs):
+    #     """Переопределяем метод save для автоматического присваивания роли."""
+    #     if not self.pk:
+    #         # Можно изменить значение по умолчанию для роли
+    #         self.role = "user"
+    #     super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.username} - {self.role}'
+        return self.username
