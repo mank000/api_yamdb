@@ -7,6 +7,10 @@ from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.response import Response
+from http import HTTPStatus
+
 
 from api.filters import TitleFilter
 from reviews.models import Category, Genre, Title, GenreTitle, Review, Comment
@@ -95,6 +99,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (StaffOrReadOnly,)
     pagination_class = LimitOffsetPagination
     serializer_class = TitleReciveSerializer
+    http_method_names = ['get', 'post', 'patch', 'delete']
     # filter_backends = (SearchFilter,)
     # search_fields = ['genre__slug',]
 
@@ -113,10 +118,8 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve']:
             return TitleReciveSerializer
         return TitleCreateSerializer
-
-
-
-
+    
+   
 # class GenreTitleViewSet(viewsets.ModelViewSet):
 #     """Представление для работы с моделью произведение."""
 
