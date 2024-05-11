@@ -4,6 +4,7 @@ from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from rest_framework import permissions, status, viewsets
+from rest_framework.pagination import LimitOffsetPagination
 
 
 from reviews.models import Category, Genre, Title, GenreTitle, Review, Comment
@@ -86,6 +87,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     permission_classes = (StaffOrReadOnly,)
+    pagination_class = LimitOffsetPagination
+
 
 
 # class GenreTitleViewSet(viewsets.ModelViewSet):
