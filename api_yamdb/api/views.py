@@ -16,7 +16,7 @@ from api.filters import TitleFilter
 from reviews.models import Category, Genre, Title, GenreTitle, Review, Comment
 from users.models import CustomUser
 from api.permissions import (
-    ChangeAdminOnly, StaffOrReadOnly, AuthorOrStaffOrReadOnly, CustomPermission
+    ChangeAdminOnly, StaffOrReadOnly, AuthorOrStaffOrReadOnly, CustomPermission, TestPerm
     )
 
 
@@ -70,8 +70,8 @@ class CategoryViewSet(ModelMixinSet):
     serializer_class = CategorySerializer
     # permission_classes = ( permissions.IsAuthenticatedOrReadOnly,)
     #                      AnonimReadOnly,)
-    permission_classes = (CustomPermission,)
-
+    #permission_classes = (CustomPermission,)
+    permission_classes = (StaffOrReadOnly,)
     filter_backends = (SearchFilter, )
     search_fields = ("name",)
     lookup_field = "slug"
@@ -82,8 +82,8 @@ class GenreViewSet(ModelMixinSet):
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    # permission_classes = (StaffOrReadOnly,)
-    permission_classes = (CustomPermission,)
+    permission_classes = (StaffOrReadOnly,)
+    #permission_classes = (CustomPermission,)
     filter_backends = (SearchFilter, )
     search_fields = ("name",)
     lookup_field = "slug"
@@ -160,8 +160,9 @@ class CommentViewSet(viewsets.ModelViewSet):
     # queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-#                          AuthorOrStaffOrReadOnly,)
-                            CustomPermission,)
+#                            TestPerm,)
+                          AuthorOrStaffOrReadOnly,)
+#                            CustomPermission,)
     def get_review(self):
         """Получаем отзыв для комментария."""
         return get_object_or_404(
