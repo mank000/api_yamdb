@@ -36,14 +36,15 @@ class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор для модели Категории."""
     class Meta:
         model = Category
-        fields = ("id", "name", "slug")
+        fields = ("name", "slug")
+        
    
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Жанра."""
     class Meta:
         model = Genre
-        fields = ("id", "name", "slug")
+        fields = ("name", "slug")
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -62,19 +63,18 @@ class GenreTitleSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Отзыва."""
-    pub_date = serializers.DateTimeField(
-        source="publishedmodel.pub_date", read_only=True
+    author = serializers.StringRelatedField(
+        read_only=True
     )
 
     class Meta:
         model = Review
         fields = ("id", "text", "author", "score", "title", "pub_date")
 
-
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Комментария."""
-    pub_date = serializers.DateTimeField(
-        source="publishedmodel.pub_date", read_only=True
+    author = serializers.SlugRelatedField("author",
+        read_only=True
     )
 
     class Meta:
