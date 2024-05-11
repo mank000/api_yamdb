@@ -3,10 +3,12 @@ from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
+from django.db.models import Avg
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
-
+from api.filters import TitleFilter
 from reviews.models import Category, Genre, Title, GenreTitle, Review, Comment
 from users.models import CustomUser
 from api.permissions import (
@@ -19,7 +21,9 @@ from api.serializers import (
     UsersSerializer,
     CategorySerializer,
     GenreSerializer,
-    TitleSerializer,
+    TitleReciveSerializer,
+    TitleCreateSerializer,
+    #TitleSerializer,
     GenreTitleSerializer,
     ReviewSerializer,
     CommentSerializer,
@@ -83,11 +87,33 @@ class GenreViewSet(ModelMixinSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Представление для работы с моделью титл."""
-
+    
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilter
+    #serializer_class = TitleSerializer
     permission_classes = (StaffOrReadOnly,)
     pagination_class = LimitOffsetPagination
+    serializer_class = TitleReciveSerializer
+    # filter_backends = (SearchFilter,)
+    # search_fields = ['genre__slug',]
+
+    def get_queryset(self):
+        return Title.objects.annotate(rating=Avg('reviews'))
+    
+
+
+    def get_serializer_class(self):
+        """
+        Переопределяем метод get_serializer_class()
+        для проверки какаяоперация REST
+        была использована и возвращаем серриализаторы
+        для записи и чтения.
+        """
+        if self.action in ['list', 'retrieve']:
+            return TitleReciveSerializer
+        return TitleCreateSerializer
+
 
 
 
