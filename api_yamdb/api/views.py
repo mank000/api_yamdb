@@ -135,6 +135,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = ( permissions.IsAuthenticatedOrReadOnly,
                           AuthorOrStaffOrReadOnly,)
+    http_method_names = ['get', 'post', 'patch', 'delete']
     
     def get_title(self):
         """Возвращает объект текущего произведения."""
@@ -163,6 +164,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 #                            TestPerm,)
                           AuthorOrStaffOrReadOnly,)
 #                            CustomPermission,)
+    http_method_names = ['get', 'post', 'patch', 'delete']
     def get_review(self):
         """Получаем отзыв для комментария."""
         return get_object_or_404(
