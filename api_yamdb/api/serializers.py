@@ -117,12 +117,14 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = ("id", "text", "author", "score", "title", "pub_date")
 
+
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Комментария."""
-    author = serializers.SlugRelatedField("author",
-        read_only=True
+    author = serializers.StringRelatedField(read_only=True
     )
 
     class Meta:
         model = Comment
-        fields = ("id", "text", "author", "review", "pub_date")
+#        fields = ("id", "text", "author", "review", "pub_date")
+        fields = ("id", "text", "author", "pub_date")
+#        fields = ("id", "text", "author")

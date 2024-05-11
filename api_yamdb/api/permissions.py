@@ -44,6 +44,7 @@ class AuthorOrStaffOrReadOnly(permissions.BasePermission):
         )
 
     def has_object_permission(self, request, view, obj):
+        print ('автор= ',obj.author, ' user= ',request.user)
         return (
             request.method in permissions.SAFE_METHODS
             or obj.author == request.user
@@ -66,3 +67,14 @@ class CustomPermission(permissions.BasePermission):
         )
 
 
+class TestPerm(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        print("попали сюда", obj.author)
+        return (
+            request.method in permissions.SAFE_METHODS
+            or request.user.is_authenticated
+            and (request.user.role in ['super_admin', 'admin']
+                 or request.user.is_staff
+                 or request.user == obj.author)
+        )
