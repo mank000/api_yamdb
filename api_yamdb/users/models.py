@@ -49,12 +49,12 @@ class CustomUser(AbstractUser):
                             verbose_name="Роль"
                             )
 
-    def save(self, *args, **kwargs):
-        """Переопределяем метод save для автоматического присваивания роли."""
-        if not self.pk:
-            # Можно изменить значение по умолчанию для роли
-            self.role = "user"
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     """Переопределяем метод save для автоматического присваивания роли."""
+    #     if not self.pk:
+    #         # Можно изменить значение по умолчанию для роли
+    #         self.role = "user"
+    #     super().save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.username} - {self.role}'
