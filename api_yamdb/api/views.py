@@ -95,18 +95,14 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
-    #serializer_class = TitleSerializer
     permission_classes = (StaffOrReadOnly,)
     pagination_class = LimitOffsetPagination
     serializer_class = TitleReciveSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
-    # filter_backends = (SearchFilter,)
-    # search_fields = ['genre__slug',]
 
     def get_queryset(self):
-        return Title.objects.annotate(rating=Avg('reviews'))
+        return Title.objects.annotate(rating=Avg('reviews__score'))
     
-
 
     def get_serializer_class(self):
         """
@@ -119,14 +115,6 @@ class TitleViewSet(viewsets.ModelViewSet):
             return TitleReciveSerializer
         return TitleCreateSerializer
     
-   
-# class GenreTitleViewSet(viewsets.ModelViewSet):
-#     """Представление для работы с моделью произведение."""
-
-#     queryset = GenreTitle.objects.all()
-#     serializer_class = GenreTitleSerializer
-#     permission_classes = (ChangeAdminOnly)
-
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """Представление для работы с моделью отзыв."""
@@ -170,7 +158,6 @@ class CommentViewSet(viewsets.ModelViewSet):
         return get_object_or_404(
             Review,
             pk=self.kwargs.get("review_id"),
-            # title__id=self.kwargs.get("title_id"),
         )
 
 
