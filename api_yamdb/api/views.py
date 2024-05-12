@@ -8,6 +8,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
+from .utils import send_to_email, make_confirmation_code
+from rest_framework.decorators import api_view, permission_classes
+
 from api.filters import TitleFilter
 from reviews.models import Category, Genre, Title, GenreTitle, Review, Comment
 from users.models import CustomUser
