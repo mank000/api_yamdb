@@ -74,54 +74,73 @@ def signup(request):
                     status=status.HTTP_400_BAD_REQUEST)
 
 
-class update_profile(viewsets.ModelViewSet):
-    """Работа с пользователями."""
-    queryset = CustomUser.objects.all()
-    serializer_class = UsersSerializer
-    permission_classes = (ChangeAdminOnly,)
-    search_fields = ("username",)
-    lookup_field = "username"
-    http_method_names = ['get', 'post', 'patch', 'delete']
+# class update_profile(viewsets.ModelViewSet):
+#     """Работа с пользователями."""
+#     queryset = CustomUser.objects.all()
+#     serializer_class = UsersSerializer
+#     permission_classes = (ChangeAdminOnly,)
+#     search_fields = ("username",)
+#     lookup_field = "username"
+#     http_method_names = ['get', 'post', 'patch', 'delete']
 
-    @action(
-        detail=False, methods=['get', 'patch'],
-        url_path='me', url_name='me',
-        permission_classes=(permissions.IsAuthenticated,)
-    )
-    def my_profile(self, request):
-        serializer = UsersSerializer(request.user)
-        if request.method == 'PATCH':
-            serializer = UsersSerializer(
-                request.user, data=request.data, partial=True
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-# @api_view(['PATCH', "POST", "GET"])
-# @permission_classes([IsAuthenticated])
-# def update_profile(request):
-#     if request.method == "POST":
-#         serializer = UserCreateSerializer(data=request.data)
-#         if (serializer.is_valid()
-#                 and serializer.validated_data.get("username") != "me"):
-#             user = serializer.save()
-#             user.save()
-#             # доделать проверку на код подтверждения
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#     if request.method == "GET":
-#         search_query = request.GET.get('search', None)
-#         pagination_class = LimitOffsetPagination
-#         if search_query:
-#             users = CustomUser.objects.filter(username=search_query)
-#         else:
-#             users = CustomUser.objects.all()
-
-#         serializer = UserSearchSerializer(users, many=True)
+#     @action(
+#         detail=False, methods=['get', 'patch'],
+#         url_path='me', url_name='me',
+#         permission_classes=(permissions.IsAuthenticated,)
+#     )
+#     def my_profile(self, request):
+#         serializer = UsersSerializer(request.user)
+#         if request.method == 'PATCH':
+#             serializer = UsersSerializer(
+#                 request.user, data=request.data, partial=True
+#             )
+#             serializer.is_valid(raise_exception=True)
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_200_OK)
 #         return Response(serializer.data, status=status.HTTP_200_OK)
+
+def get_paginated_response(NumberPagination):
+    def get_paginated_response(self, data):
+        return Response(
+            {
+                'count': NumberPagination.count,
+                'next': NumberPagination.get_next_link(),
+                'previous': NumberPagination.get_previous_link(),
+                'results': data
+            }
+        )
+
+
+@api_view(['PATCH', "POST", "GET"])
+@permission_classes([IsAuthenticated])
+def update_profile(request):
+    if request.method == "POST":
+        serializer = UserCreateSerializer(data=request.data)
+        if (serializer.is_valid()
+                and serializer.validated_data.get("username") != "me"):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == "GET":
+
+        search_query = request.GET.get('search', None)
+        paginator = LimitOffsetPagination()
+        paginator.page_size = 10
+
+        if search_query:
+            users = CustomUser.objects.filter(username=search_query)
+        else:
+            users = CustomUser.objects.all()
+
+        paginated_users = paginator.paginate_queryset(users, request=request)
+        serializer = UserSearchSerializer(paginated_users, many=True)
+        print(paginated_users)
+        response_data = {
+            'count': paginator.count,
+            'results': paginated_users,
+        }
+
+        return paginator.get_paginated_response(response_data)
 
 
 
