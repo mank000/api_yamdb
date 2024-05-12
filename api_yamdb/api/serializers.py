@@ -1,8 +1,34 @@
+from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
 from users.models import CustomUser
 
+class UserWithoutTokenSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор формы регистрации.
+    """
+
+    username = serializers.SlugField(max_length=150)
+    email = serializers.EmailField(max_length=254)
+
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'email')
+
+        
+    def validate_username(self, username):
+        if username.lower() == 'me':
+            raise ValidationError({"message": "недопустимый username"})
+        return username
+
+    def validate(self, data):
+        if CustomUser.objects.filter(username=data['username']).exists():
+            user = CustomUser.objects.get(username=data['username'])
+            if user.email == data['email']:
+                return data
+            raise ValidationError({"message": "Неверный email"})
+        return data
 
 
 class UsersSerializer(serializers.ModelSerializer):

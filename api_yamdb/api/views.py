@@ -27,6 +27,7 @@ from api.serializers import (
     GenreTitleSerializer,
     ReviewSerializer,
     CommentSerializer,
+    UserWithoutTokenSerializer
 )
 from users.models import CustomUser
 
