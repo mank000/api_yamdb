@@ -20,12 +20,7 @@ class UserWithoutTokenSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         required=True,
         max_length=254,
-        validators=[
-            UniqueValidator(
-                queryset=CustomUser.objects.all(),
-                message="Пользователь с этим email уже зарегистрирован."
-            )
-        ])
+        )
 
     class Meta:
         model = CustomUser
@@ -71,3 +66,12 @@ class UserCreateSerializer(serializers.ModelSerializer):
                   'last_name',
                   'bio',
                   'role']
+
+
+class UserSearchSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=False,
+                                     max_length=150)
+    
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username',]
