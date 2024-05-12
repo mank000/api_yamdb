@@ -87,7 +87,7 @@ class GenreViewSet(ModelMixinSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Представление для работы с моделью титл."""
-    
+    http_method_names = ['get', 'post', 'patch', 'delete']    
     queryset = Title.objects.all()
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
@@ -99,7 +99,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     # search_fields = ['genre__slug',]
 
     def get_queryset(self):
-        return Title.objects.annotate(rating=Avg('reviews'))
+        return Title.objects.annotate(rating=Avg('reviews__score'))
     
 
 
@@ -132,6 +132,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
     permission_classes = ( permissions.IsAuthenticatedOrReadOnly,
                           AuthorOrStaffOrReadOnly,)
+    http_method_names = ['get', 'post', 'patch', 'delete']
     
     def get_title(self):
         """Возвращает объект текущего произведения."""
@@ -160,6 +161,8 @@ class CommentViewSet(viewsets.ModelViewSet):
 #                            TestPerm,)
                           AuthorOrStaffOrReadOnly,)
 #                            CustomPermission,)
+    http_method_names = ['get', 'post', 'patch', 'delete']
+
     def get_review(self):
         """Получаем отзыв для комментария."""
         return get_object_or_404(

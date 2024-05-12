@@ -160,7 +160,8 @@ class Review(PublishedModel):
         ordering = ("-pub_date",)
         constraints = (
             models.UniqueConstraint(
-                fields=["author", "title"], name="unique_author_title"
+                fields=["author", "title"],
+                name="unique_author_title"
             ),
         )
 
