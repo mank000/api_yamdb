@@ -1,6 +1,7 @@
 from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
 from users.models import CustomUser
 
@@ -33,40 +34,41 @@ class UserWithoutTokenSerializer(serializers.ModelSerializer):
 
 class UsersSerializer(serializers.ModelSerializer):
     """Сериализатор кастомной модели User."""
-    username = serializers.SlugField(max_length=150)
-#    email = serializers.EmailField(max_length=254)
+    username = serializers.SlugField(max_length=150, validators=[UniqueValidator(queryset=CustomUser.objects.all())])
+    email = serializers.EmailField(max_length=254, validators=[UniqueValidator(queryset=CustomUser.objects.all())])
 
     class Meta:
         model = CustomUser
+
         fields = (
-            'username', 'email', 'first_name',
-            'last_name', 'bio', 'role',
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role'
         )
-#        read_only_fields = ('username', 'email', 'role',)
-        # fields = (
-        #     'username', 'email', 'first_name', 'last_name', 'bio', 'role'
-        # )
+        extra_kwargs = {
+            'first_name': {'required': False},
+            'last_name': {'required': False},
+        }
     
-    def validate_username(self, username):
-        if username in 'me':
-            raise serializers.ValidationError(
-                'Использовать имя me запрещено'
-            )
-        return username
+    # def validate_username(self, username):
+    #     if username in 'me':
+    #         raise serializers.ValidationError(
+    #             'Использовать имя me запрещено'
+    #         )
+    #     return username
 
 
-class AdminSerializer(serializers.ModelSerializer):
-    """Сериализатор администратора с доступом к ролям."""
-    role = serializers.ChoiceField(
-        choices=CustomUser.ROLE_CHOICES, required=False
-        )
 
-    class Meta:
-        model = CustomUser
-        fields = (
-            'username', 'email', 'first_name',
-            'last_name', 'bio', 'role',
-        )
+# class AdminSerializer(serializers.ModelSerializer):
+#     """Сериализатор администратора с доступом к ролям."""
+#     role = serializers.ChoiceField(
+#         choices=CustomUser.ROLE_CHOICES, required=False
+#         )
+
+#     class Meta:
+#         model = CustomUser
+#         fields = (
+#             'username', 'email', 'first_name',
+#             'last_name', 'bio', 'role',
+#         )
 
 
 class CategorySerializer(serializers.ModelSerializer):
