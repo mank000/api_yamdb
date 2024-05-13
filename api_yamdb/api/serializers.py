@@ -34,7 +34,7 @@ class UserWithoutTokenSerializer(serializers.ModelSerializer):
 class UsersSerializer(serializers.ModelSerializer):
     """Сериализатор кастомной модели User."""
     username = serializers.SlugField(max_length=150)
-    email = serializers.EmailField(max_length=254)
+#    email = serializers.EmailField(max_length=254)
 
     class Meta:
         model = CustomUser
@@ -42,7 +42,17 @@ class UsersSerializer(serializers.ModelSerializer):
             'username', 'email', 'first_name',
             'last_name', 'bio', 'role',
         )
-        read_only_fields = ('username', 'email', 'role',)
+#        read_only_fields = ('username', 'email', 'role',)
+        # fields = (
+        #     'username', 'email', 'first_name', 'last_name', 'bio', 'role'
+        # )
+    
+    def validate_username(self, username):
+        if username in 'me':
+            raise serializers.ValidationError(
+                'Использовать имя me запрещено'
+            )
+        return username
 
 
 class AdminSerializer(serializers.ModelSerializer):
