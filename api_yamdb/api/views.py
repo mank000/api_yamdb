@@ -90,6 +90,63 @@ def signup(request):
     return Response(serializer.errors,
                     status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['PATCH', "POST", "GET"])
+@permission_classes([IsAuthenticated])
+def update_profile(request):
+    if request.method == "POST":
+        serializer = UserCreateSerializer(data=request.data)
+        if (serializer.is_valid()
+                and serializer.validated_data.get("username") != "me"):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == "GET":
+
+        search_query = request.GET.get('search', None)
+        paginator = LimitOffsetPagination()
+        paginator.page_size = 10
+
+        if search_query:
+            users = CustomUser.objects.filter(username=search_query)
+        else:
+            users = CustomUser.objects.all()
+
+        paginated_users = paginator.paginate_queryset(users, request=request)
+        serializer = UserSearchSerializer(paginated_users, many=True)
+        print(paginated_users)
+        response_data = {
+            'count': paginator.count,
+            'results': paginated_users,
+        }
+
+        return paginator.get_paginated_response(response_data)
+
+
+
+@api_view(['POST'])
+def get_token(request):
+    seralizer = UserTokenSerializer(data=request.data)
+    if seralizer.is_valid():
+        user = get_object_or_404(
+            CustomUser,
+            username=seralizer.validated_data.get("username")
+        )
+        if (user.confirmation_code
+                == seralizer.validated_data.get("confirmation_code")):
+            refresh = RefreshToken.for_user(user)
+            user.confirmation_code = ''
+            user.save()
+            return Response({'token': str(refresh.access_token)},
+                            status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Неправильный код!'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+    else:
+        return Response(seralizer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """Работа с пользователями."""
