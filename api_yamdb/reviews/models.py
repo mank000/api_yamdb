@@ -138,7 +138,7 @@ class GenreTitle(models.Model):
 
 
 class Review(PublishedModel):
-    """Класс рецензий"""
+    """Класс рецензий."""
 
     text = models.TextField(verbose_name="текст")
     author = models.ForeignKey(

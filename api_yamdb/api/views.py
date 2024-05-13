@@ -116,6 +116,7 @@ def get_token(request):
 
 class UserViewSet(viewsets.ModelViewSet):
     """Работа с пользователями."""
+
     queryset = CustomUser.objects.all()
     serializer_class = UsersSerializer
     permission_classes = (ChangeAdminOnly,)

@@ -8,9 +8,7 @@ from users.models import CustomUser
 
 
 class UserWithoutTokenSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор формы регистрации.
-    """
+    """Сериализатор формы регистрации."""
 
     username = serializers.SlugField(max_length=150)
     email = serializers.EmailField(max_length=254)
@@ -34,9 +32,7 @@ class UserWithoutTokenSerializer(serializers.ModelSerializer):
 
 
 class UserTokenSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор получения JWT-токена.
-    """
+    """Сериализатор получения JWT-токена."""
 
     username = serializers.CharField(max_length=150)
     confirmation_code = serializers.CharField(required=True)
@@ -64,6 +60,7 @@ class UserTokenSerializer(serializers.ModelSerializer):
 
 class UsersSerializer(serializers.ModelSerializer):
     """Сериализатор кастомной модели User."""
+
     username = serializers.SlugField(
         max_length=150,
         validators=[UniqueValidator(queryset=CustomUser.objects.all())]
@@ -87,6 +84,7 @@ class UsersSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор для модели Категории."""
+
     class Meta:
         model = Category
         fields = ("name", "slug")
@@ -94,15 +92,14 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Жанра."""
+
     class Meta:
         model = Genre
         fields = ("name", "slug")
 
 
 class TitleCreateSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор создания произведений.
-    """
+    """Сериализатор создания произведений."""
 
     name = serializers.CharField(
         max_length=200,
@@ -125,9 +122,7 @@ class TitleCreateSerializer(serializers.ModelSerializer):
 
 
 class TitleReciveSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор получения произведений.
-    """
+    """Сериализатор получения произведений."""
 
     category = CategorySerializer(
         read_only=True,
@@ -148,6 +143,7 @@ class TitleReciveSerializer(serializers.ModelSerializer):
 
 class GenreTitleSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Соответствия жанра и произведения."""
+
     class Meta:
         model = GenreTitle
         fields = ("id", "genre", "title")
@@ -155,6 +151,7 @@ class GenreTitleSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Отзыва."""
+
     author = serializers.StringRelatedField(
         read_only=True
     )
@@ -180,6 +177,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Комментария."""
+
     author = serializers.StringRelatedField(read_only=True)
 
     class Meta:
