@@ -8,5 +8,4 @@ class CustomUserAdmin(UserAdmin):
         ('Дополнительная информация', {'fields': ('role', 'bio')}),
     )
 
-
 admin.site.register(CustomUser, CustomUserAdmin)

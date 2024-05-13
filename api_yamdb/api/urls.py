@@ -9,7 +9,7 @@ from api.views import (
     ReviewViewSet,
     TitleViewSet,
 )
-
+from api.views import (signup, get_token)
 
 router_v1 = DefaultRouter()
 router_v1.register(
@@ -42,4 +42,6 @@ router_v1.register(
 
 urlpatterns = [
     path("v1/", include(router_v1.urls)),
+    # path('api/v1/auth/signup/', signup, name='signup'),
+    # path('api/v1/auth/token/', get_token, name='get_token'),
 ]

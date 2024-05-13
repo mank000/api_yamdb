@@ -1,4 +1,5 @@
 from django.forms import ValidationError
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -29,6 +30,33 @@ class UserWithoutTokenSerializer(serializers.ModelSerializer):
             if user.email == data['email']:
                 return data
             raise ValidationError({"message": "Неверный email"})
+        return data
+
+
+class UserTokenSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор получения JWT-токена.
+    """
+
+    username = serializers.CharField(max_length=150)
+    confirmation_code = serializers.CharField(required=True)
+
+    class Meta:
+        model = CustomUser
+        fields = ('username', 'confirmation_code')
+
+    def validate_username(self, username):
+        if CustomUser.objects.filter(username=username).exists():
+            return username
+        raise Http404(f'Недопустимое имя пользователя или пользователь `{username}` не найден.')
+
+    def validate(self, data):
+        # Получаем пользователя по имени пользователя (username)
+        user = CustomUser.objects.filter(username=data.get('username')).first()
+        if not user:
+            raise ValidationError({"Ошибка": 'Пользователь не найден'})  # Изменяем сообщение об ошибке
+        if data.get('confirmation_code') != user.confirmation_code:
+            raise ValidationError({"Ошибка": 'Неверный код подтверждения'})
         return data
 
 

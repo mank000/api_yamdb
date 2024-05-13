@@ -9,8 +9,9 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 from http import HTTPStatus
-
+from rest_framework.decorators import api_view, permission_classes
 
 from api.filters import TitleFilter
 from reviews.models import Category, Genre, Title, GenreTitle, Review, Comment
@@ -18,7 +19,6 @@ from users.models import CustomUser
 from api.permissions import (
     ChangeAdminOnly, StaffOrReadOnly, AuthorOrStaffOrReadOnly, CustomPermission, TestPerm
     )
-
 
 from api.mixins import ModelMixinSet
 from api.serializers import (
@@ -31,11 +31,95 @@ from api.serializers import (
     GenreTitleSerializer,
     ReviewSerializer,
     CommentSerializer,
+    UserWithoutTokenSerializer,
+    UserTokenSerializer,
 )
-from users.models import CustomUser
+from api.utils import send_to_email, make_confirmation_code
+
+
 
 #CustomUser = get_user_model()
 
+
+"""Start import from  view.py Artem"""
+@api_view(['POST'])
+def signup(request):
+    serializer = UserWithoutTokenSerializer(data=request.data)
+
+    if (serializer.is_valid()):
+
+        existing_user_username = CustomUser.objects.filter(
+            username=serializer.validated_data.get('username'))
+       
+        existing_user_email = CustomUser.objects.filter(
+            email=serializer.validated_data.get('email'))
+        
+        existing_user = CustomUser.objects.filter(
+            username=serializer.validated_data.get('username'),
+            email=serializer.validated_data.get('email'))
+
+        if (existing_user_username and existing_user_username.first().username == serializer.validated_data.get("username")
+                and existing_user_username.first().email != serializer.validated_data.get("email")):
+            return Response({"message": "Пользователь уже зарегистрирован"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        
+        if (existing_user_username
+                and existing_user_username.first().username == serializer.validated_data.get("username")
+                and existing_user_username.first().email == serializer.validated_data.get("email")
+                and existing_user_username.first().confirmation_code != ""):
+            return Response({"message": "Пользователь уже зарегистрирован"},
+                                        status=status.HTTP_200_OK)
+
+        if (existing_user_email.exists()
+                and not existing_user_username.exists()):
+            return Response({"message": "Пользователь уже зарегистрирован"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        
+        if (existing_user_email or existing_user or existing_user_username):
+            return Response({"message": "Пользователь уже зарегистрирован"},
+                            status=status.HTTP_200_OK)
+
+        user = serializer.save()
+        confirmation_code = make_confirmation_code()
+        user.confirmation_code = confirmation_code
+        sended = send_to_email(serializer.validated_data.get("email"),
+                               confirmation_code)
+        user.save()
+
+        if sended == 0:
+            return Response({"error": "Ошибка отправки письма. "
+                             "Свяжитесь с администратором"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(serializer.data,
+                        status=status.HTTP_200_OK)
+    return Response(serializer.errors,
+                    status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def get_token(request):
+    seralizer = UserTokenSerializer(data=request.data)
+    if seralizer.is_valid():
+        user = get_object_or_404(
+            CustomUser,
+            username=seralizer.validated_data.get("username")
+        )
+        if (user.confirmation_code
+                == seralizer.validated_data.get("confirmation_code")):
+            refresh = RefreshToken.for_user(user)
+            user.confirmation_code = ''
+            user.save()
+            return Response({'token': str(refresh.access_token)},
+                            status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Неправильный код!'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+    else:
+        return Response(seralizer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+"""End import from  view.py Artem"""
 
 class UserViewSet(viewsets.ModelViewSet):
     """Работа с пользователями."""
