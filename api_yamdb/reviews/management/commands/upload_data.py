@@ -50,12 +50,7 @@ def upload_data(file_name, class_name):
                     setattr(obj, field, value)
                 elif field in FIELD_TO_KEY:
                     # Получение данных из связанных моделей.
-                    try:
-                        data = FIELD_TO_KEY[field][1].objects.get(pk=value)
-                    except FIELD_TO_KEY[field][1].DoesNotExist:
-                        print(f'Объект с id={value} не найден в '
-                              f'базе данных {FIELD_TO_KEY[field][1]}')
-                        continue
+                    data = FIELD_TO_KEY[field][1].objects.get(pk=value)
                     setattr(obj, FIELD_TO_KEY[field][0], data)
                 else:
                     # Остальные поля таблицы.
