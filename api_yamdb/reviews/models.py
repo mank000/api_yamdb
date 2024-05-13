@@ -86,7 +86,8 @@ class Title(models.Model):
         verbose_name="год выпуска",
         validators=[
             MinValueValidator(
-                MIN_VALUE_YEAR, message="Значение года не может быть отрицательным"
+                MIN_VALUE_YEAR, message=("Значение года не "
+                                         "может быть отрицательным")
             ),
             MaxValueValidator(
                 int(datetime.now().year),
@@ -118,7 +119,11 @@ class Title(models.Model):
 class GenreTitle(models.Model):
     """Вспомогательный класс, для связи жанра и произведения."""
 
-    genre = models.ForeignKey(Genre, on_delete=models.CASCADE, verbose_name="жанр")
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.CASCADE,
+        verbose_name="жанр"
+    )
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE, verbose_name="произведение"
     )
@@ -137,13 +142,22 @@ class Review(PublishedModel):
 
     text = models.TextField(verbose_name="текст")
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="reviews", verbose_name="Aвтор"
+        User,
+        on_delete=models.CASCADE,
+        related_name="reviews",
+        verbose_name="Aвтор"
     )
     score = models.PositiveIntegerField(
         verbose_name="Оценка",
         validators=[
-            MinValueValidator(MIN_SCORE_VALUE, message="Оценка ниже допустимой"),
-            MaxValueValidator(MAX_SCORE_VALUE, message="Оценка выше допустимой"),
+            MinValueValidator(
+                MIN_SCORE_VALUE,
+                message="Оценка ниже допустимой"
+            ),
+            MaxValueValidator(
+                MAX_SCORE_VALUE,
+                message="Оценка выше допустимой"
+            ),
         ],
     )
     title = models.ForeignKey(
@@ -174,7 +188,10 @@ class Comment(PublishedModel):
 
     text = models.TextField(verbose_name="текст")
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="comments", verbose_name="Aвтор"
+        User,
+        on_delete=models.CASCADE,
+        related_name="comments",
+        verbose_name="Aвтор"
     )
     review = models.ForeignKey(
         Review,

@@ -6,6 +6,7 @@ from reviews.models import Title
 class CharFilterInFilter(filters.BaseInFilter, filters.CharFilter):
     pass
 
+
 class TitleFilter(filters.FilterSet):
     """Кастомный фильтр для поиска."""
 

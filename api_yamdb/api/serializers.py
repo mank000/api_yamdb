@@ -6,6 +6,7 @@ from rest_framework.validators import UniqueValidator
 from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
 from users.models import CustomUser
 
+
 class UserWithoutTokenSerializer(serializers.ModelSerializer):
     """
     Сериализатор формы регистрации.
@@ -18,7 +19,6 @@ class UserWithoutTokenSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ('username', 'email')
 
-        
     def validate_username(self, username):
         if username.lower() == 'me':
             raise ValidationError({"message": "недопустимый username"})
@@ -81,9 +81,8 @@ class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор для модели Категории."""
     class Meta:
         model = Category
-        fields = ("name", "slug")
-        
-   
+        fields = ("name", "slug")  
+
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Жанра."""

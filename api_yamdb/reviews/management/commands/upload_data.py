@@ -10,7 +10,7 @@ from reviews.models import (
     GenreTitle,
     Review,
     Title
-    )
+)
 from users.models import CustomUser
 
 
@@ -29,6 +29,7 @@ FIELD_TO_KEY = {
     'genre_id': ['genre', Genre],
     'title_id': ['title', Title],
     'author': ['author', CustomUser]}
+
 
 def upload_data(file_name, class_name):
     dir = os.getcwd()+'\\static\\data'
@@ -55,24 +56,16 @@ def upload_data(file_name, class_name):
                         continue
                     setattr(obj, FIELD_TO_KEY[field][0], data)
                 else:
-                    # Остальные поля таблице.
+                    # Остальные поля таблицы.
                     setattr(obj, field, value)
             objects.append(obj)
-        
-        # Для более быстрой загрузки можно использовать bulk_create(objects)
-        # Но, если возникнет ошибка, данные в таблицу записаны не будут
-              
-        # try:
-        #     class_name.objects.bulk_create(objects)
-        # except Exception as e:
-        #     print(f'Ошибка при загрузке данных в таблицу {class_name.__name__}: {e}')
 
-        # Чуть более медленная загрузка данных в БД.
         for obj in objects:
             try:
                 obj.save()
             except Exception as e:
                 print(f'Ошибка при загрузке данных в таблицу {class_name.__name__}: {e}')
+
 
 class Command(BaseCommand):
     help = 'Load data from CSV file'

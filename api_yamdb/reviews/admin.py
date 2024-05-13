@@ -6,8 +6,8 @@ from reviews.models import (
     Genre,
     GenreTitle,
     Review,
-    Title
-    )
+    Title,
+)
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -58,7 +58,6 @@ class ReviewAdmin(admin.ModelAdmin):
     search_fields = ("author",)
 
 
-
 class CommentAdmin(admin.ModelAdmin):
     """Класс Admin Comment."""
 
@@ -72,6 +71,7 @@ class CommentAdmin(admin.ModelAdmin):
     list_filter = ("author", "pub_date")
     search_fields = ("author",)
     empty_value_display = "пусто"
+
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Genre, GenreAdmin)
