@@ -75,28 +75,6 @@ class UsersSerializer(serializers.ModelSerializer):
             'first_name': {'required': False},
             'last_name': {'required': False},
         }
-    
-    # def validate_username(self, username):
-    #     if username in 'me':
-    #         raise serializers.ValidationError(
-    #             'Использовать имя me запрещено'
-    #         )
-    #     return username
-
-
-
-# class AdminSerializer(serializers.ModelSerializer):
-#     """Сериализатор администратора с доступом к ролям."""
-#     role = serializers.ChoiceField(
-#         choices=CustomUser.ROLE_CHOICES, required=False
-#         )
-
-#     class Meta:
-#         model = CustomUser
-#         fields = (
-#             'username', 'email', 'first_name',
-#             'last_name', 'bio', 'role',
-#         )
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -113,12 +91,6 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
         fields = ("name", "slug")
 
-
-# class TitleSerializer(serializers.ModelSerializer):
-#     """Сериализатор для модели Произведения."""
-#     class Meta:
-#         model = Title
-#         fields = ("name", "year", "genre", "category", "description")
 
 class TitleCreateSerializer(serializers.ModelSerializer):
     """
@@ -182,7 +154,6 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        # fields = ("id", "text", "author", "score", "title", "pub_date")
         fields = ("id", "text", "author", "score", "pub_date")
 
     def validate(self, attrs):
@@ -205,6 +176,4 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-#        fields = ("id", "text", "author", "review", "pub_date")
         fields = ("id", "text", "author", "pub_date")
-#        fields = ("id", "text", "author")

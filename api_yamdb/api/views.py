@@ -2,22 +2,18 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
-from django.contrib.auth import get_user_model
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.exceptions import MethodNotAllowed
-from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from http import HTTPStatus
 from rest_framework.decorators import api_view, permission_classes
 
 from api.filters import TitleFilter
-from reviews.models import Category, Genre, Title, GenreTitle, Review, Comment
+from reviews.models import Category, Genre, Title, Review
 from users.models import CustomUser
 from api.permissions import (
-    ChangeAdminOnly, StaffOrReadOnly, AuthorOrStaffOrReadOnly, CustomPermission, TestPerm
+    ChangeAdminOnly, StaffOrReadOnly, AuthorOrStaffOrReadOnly
     )
 
 from api.mixins import ModelMixinSet
@@ -27,18 +23,12 @@ from api.serializers import (
     GenreSerializer,
     TitleReciveSerializer,
     TitleCreateSerializer,
-    #TitleSerializer,
-    GenreTitleSerializer,
     ReviewSerializer,
     CommentSerializer,
     UserWithoutTokenSerializer,
     UserTokenSerializer,
 )
 from api.utils import send_to_email, make_confirmation_code
-
-
-
-#CustomUser = get_user_model()
 
 
 """Start import from  view.py Artem"""
@@ -153,9 +143,6 @@ class CategoryViewSet(ModelMixinSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    # permission_classes = ( permissions.IsAuthenticatedOrReadOnly,)
-    #                      AnonimReadOnly,)
-    #permission_classes = (CustomPermission,)
     permission_classes = (StaffOrReadOnly,)
     filter_backends = (SearchFilter, )
     search_fields = ("name",)
@@ -168,7 +155,6 @@ class GenreViewSet(ModelMixinSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (StaffOrReadOnly,)
-    #permission_classes = (CustomPermission,)
     filter_backends = (SearchFilter, )
     search_fields = ("name",)
     lookup_field = "slug"
@@ -204,7 +190,6 @@ class TitleViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     """Представление для работы с моделью отзыв."""
 
-    # queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = ( permissions.IsAuthenticatedOrReadOnly,
                           AuthorOrStaffOrReadOnly,)
@@ -231,12 +216,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     """Представление для работы с моделью коммент."""
 
-    # queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-#                            TestPerm,)
                           AuthorOrStaffOrReadOnly,)
-#                            CustomPermission,)
     http_method_names = ['get', 'post', 'patch', 'delete']
     def get_review(self):
         """Получаем отзыв для комментария."""

@@ -34,14 +34,14 @@ router_v1.register(
     basename="reviews",
 )
 router_v1.register(
-    'users',
+    "users",
     UserViewSet,
-    basename='users',
+    basename="users",
 )
 
 
 urlpatterns = [
     path("v1/", include(router_v1.urls)),
-    # path('api/v1/auth/signup/', signup, name='signup'),
-    # path('api/v1/auth/token/', get_token, name='get_token'),
+    path("v1/auth/signup/", signup, name='signup'),
+    path("v1/auth/token/", get_token, name='get_token'),
 ]
