@@ -48,13 +48,15 @@ class UserTokenSerializer(serializers.ModelSerializer):
     def validate_username(self, username):
         if CustomUser.objects.filter(username=username).exists():
             return username
-        raise Http404(f'Недопустимое имя пользователя или пользователь `{username}` не найден.')
+        raise Http404('Недопустимое имя пользователя или пользователь'
+                      f'`{username}` не найден.')
 
     def validate(self, data):
         # Получаем пользователя по имени пользователя (username)
         user = CustomUser.objects.filter(username=data.get('username')).first()
         if not user:
-            raise ValidationError({"Ошибка": 'Пользователь не найден'})  # Изменяем сообщение об ошибке
+            raise ValidationError({"Ошибка": 'Пользователь не найден'})
+        # Изменяем сообщение об ошибке
         if data.get('confirmation_code') != user.confirmation_code:
             raise ValidationError({"Ошибка": 'Неверный код подтверждения'})
         return data
@@ -62,8 +64,14 @@ class UserTokenSerializer(serializers.ModelSerializer):
 
 class UsersSerializer(serializers.ModelSerializer):
     """Сериализатор кастомной модели User."""
-    username = serializers.SlugField(max_length=150, validators=[UniqueValidator(queryset=CustomUser.objects.all())])
-    email = serializers.EmailField(max_length=254, validators=[UniqueValidator(queryset=CustomUser.objects.all())])
+    username = serializers.SlugField(
+        max_length=150,
+        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
+    )
+    email = serializers.EmailField(
+        max_length=254,
+        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
+    )
 
     class Meta:
         model = CustomUser
@@ -81,7 +89,7 @@ class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор для модели Категории."""
     class Meta:
         model = Category
-        fields = ("name", "slug")  
+        fields = ("name", "slug")
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -163,15 +171,16 @@ class ReviewSerializer(serializers.ModelSerializer):
         title = get_object_or_404(Title, id=title_id)
 
         if Review.objects.filter(author=author, title=title).exists():
-            raise serializers.ValidationError('Вы уже оставляли отзыв на это произведение.')
+            raise serializers.ValidationError(
+                'Вы уже оставляли отзыв на это произведение.'
+            )
 
         return attrs
 
 
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Комментария."""
-    author = serializers.StringRelatedField(read_only=True
-    )
+    author = serializers.StringRelatedField(read_only=True)
 
     class Meta:
         model = Comment

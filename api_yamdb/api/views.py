@@ -39,31 +39,36 @@ def signup(request):
 
         existing_user_username = CustomUser.objects.filter(
             username=serializer.validated_data.get('username'))
-       
+
         existing_user_email = CustomUser.objects.filter(
             email=serializer.validated_data.get('email'))
-        
+
         existing_user = CustomUser.objects.filter(
             username=serializer.validated_data.get('username'),
             email=serializer.validated_data.get('email'))
 
-        if (existing_user_username and existing_user_username.first().username == serializer.validated_data.get("username")
-                and existing_user_username.first().email != serializer.validated_data.get("email")):
+        if (existing_user_username
+            and (existing_user_username.first().username
+                 == serializer.validated_data.get("username"))
+                and (existing_user_username.first().email
+                     != serializer.validated_data.get("email"))):
             return Response({"message": "Пользователь уже зарегистрирован"},
                             status=status.HTTP_400_BAD_REQUEST)
-        
+
         if (existing_user_username
-                and existing_user_username.first().username == serializer.validated_data.get("username")
-                and existing_user_username.first().email == serializer.validated_data.get("email")
+                and (existing_user_username.first().username
+                     == serializer.validated_data.get("username"))
+                and (existing_user_username.first().email
+                     == serializer.validated_data.get("email"))
                 and existing_user_username.first().confirmation_code != ""):
             return Response({"message": "Пользователь уже зарегистрирован"},
-                                        status=status.HTTP_200_OK)
+                            status=status.HTTP_200_OK)
 
         if (existing_user_email.exists()
                 and not existing_user_username.exists()):
             return Response({"message": "Пользователь уже зарегистрирован"},
                             status=status.HTTP_400_BAD_REQUEST)
-        
+
         if (existing_user_email or existing_user or existing_user_username):
             return Response({"message": "Пользователь уже зарегистрирован"},
                             status=status.HTTP_200_OK)

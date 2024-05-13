@@ -12,7 +12,7 @@ from reviews.models import (
 
 class CategoryAdmin(admin.ModelAdmin):
     """Класс Admin Category."""
-    
+
     list_display = ("pk", "name", "slug")
     list_filter = ("name",)
     search_fields = ("name",)
@@ -21,7 +21,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 class GenreAdmin(admin.ModelAdmin):
     """Класс Admin Genre."""
-    
+
     list_display = ("pk", "name", "slug")
     list_filter = ("name",)
     search_fields = ("name",)
