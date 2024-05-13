@@ -1,6 +1,7 @@
 import csv
 import os
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from reviews.models import (
@@ -31,11 +32,21 @@ FIELD_TO_KEY = {
     'author': ['author', CustomUser]}
 
 
+# def upload_data(file_name, class_name):
+#     dir = os.getcwd()+'\\static\\data'
+#     file_name = file_name + '.csv'
+#     csv_path = os.path.join(dir, file_name)
+#     with open(csv_path, encoding='utf-8') as csvfile:
+#         reader = csv.DictReader(csvfile)
+#         objects = []
+# import os
+# import csv
+
+
 def upload_data(file_name, class_name):
-    dir = os.getcwd() + '\\static\\data'
-    file_name = file_name + '.csv'
-    csv_path = os.path.join(dir, file_name)
-    with open(csv_path, encoding='utf-8') as csvfile:
+    static_data_dir = os.path.join(settings.STATICFILES_DIRS[0], 'data')
+    file_path = os.path.join(static_data_dir, file_name + '.csv')
+    with open(file_path, encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         objects = []
         for row in reader:
