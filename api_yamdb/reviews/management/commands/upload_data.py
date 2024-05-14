@@ -32,42 +32,62 @@ FIELD_TO_KEY = {
     'author': ['author', CustomUser]}
 
 
+def get_static_data_dir():
+    return os.path.join(settings.STATICFILES_DIRS[0], 'data')
+
+
+def get_file_path(file_name):
+    static_data_dir = get_static_data_dir()
+    return os.path.join(static_data_dir, file_name + '.csv')
+
+
+def process_row(row, class_name):
+    obj = class_name()
+    for field, value in row.items():
+        if not set_field(obj, field, value, class_name):
+            return None
+    return obj
+
+
+def set_field(obj, field, value, class_name):
+    if field == 'id':
+        # Проверка уникальности и отсутствия в базе данных.
+        if class_name.objects.filter(pk=value).exists():
+            print(f'Объект с id={value} уже существует в базе данных')
+            return False
+        setattr(obj, field, value)
+    elif field in FIELD_TO_KEY:
+        # Получение данных из связанных моделей.
+        try:
+            data = FIELD_TO_KEY[field][1].objects.get(pk=value)
+        except FIELD_TO_KEY[field][1].DoesNotExist:
+            print(f'Объект с id={value} '
+                  f'не найден в базе данных {FIELD_TO_KEY[field][1]}')
+            return False
+        setattr(obj, FIELD_TO_KEY[field][0], data)
+    else:
+        # Остальные поля таблицы.
+        setattr(obj, field, value)
+    return True
+
+
 def upload_data(file_name, class_name):
-    static_data_dir = os.path.join(settings.STATICFILES_DIRS[0], 'data')
-    file_path = os.path.join(static_data_dir, file_name + '.csv')
+    file_path = get_file_path(file_name)
+
     with open(file_path, encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         objects = []
         for row in reader:
-            obj = class_name()
-            for field, value in row.items():
-                if field == 'id':
-                    # Проверка уникальности и отсутствия в базе данных.
-                    if class_name.objects.filter(pk=value).exists():
-                        print(f'Объект с id={value} уже '
-                              'существует в базе данных')
-                        continue
-                    setattr(obj, field, value)
-                elif field in FIELD_TO_KEY:
-                    # Получение данных из связанных моделей.
-                    try:
-                        data = FIELD_TO_KEY[field][1].objects.get(pk=value)
-                    except FIELD_TO_KEY[field][1].DoesNotExist:
-                        print(f'Объект с id={value} не найден в '
-                              f'базе данных {FIELD_TO_KEY[field][1]}')
-                        continue
-                    setattr(obj, FIELD_TO_KEY[field][0], data)
-                else:
-                    # Остальные поля таблицы.
-                    setattr(obj, field, value)
-            objects.append(obj)
+            obj = process_row(row, class_name)
+            if obj is not None:
+                objects.append(obj)
 
         for obj in objects:
             try:
                 obj.save()
             except Exception as e:
-                print('Ошибка при загрузке '
-                      f'данных в таблицу {class_name.__name__}: {e}')
+                print('Ошибка при загрузке данных '
+                      f'в таблицу {class_name.__name__}: {e}')
 
 
 class Command(BaseCommand):

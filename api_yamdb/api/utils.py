@@ -12,9 +12,9 @@ def make_confirmation_code():
 def send_to_email(email, code):
     """Отправляет письмо с кодом подтверждения."""
     return send_mail(
-        'Письмо с подтверждением регистрации',
+        'Letter with confirmation code',
         code,
-        'kozmin_arti@mail.ru',
+        'yamdb@user.com',
         [email],
         fail_silently=False,
     )

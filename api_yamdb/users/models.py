@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import RegexValidator
 
-# from .managers import CustomUserManager
+from .managers import CustomUserManager
 
 
 class CustomUser(AbstractUser):
@@ -56,9 +56,7 @@ class CustomUser(AbstractUser):
                                          verbose_name="Код подтверждения"
                                          )
 
-    # USERNAME_FIELD = "email"
-    # REQUIRED_FIELDS = ["username"]
-    # objects = CustomUserManager()
+    objects = CustomUserManager()
 
     def __str__(self):
         return self.username

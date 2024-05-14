@@ -52,9 +52,6 @@ class UserTokenSerializer(serializers.ModelSerializer):
         user = CustomUser.objects.filter(username=data.get('username')).first()
         if not user:
             raise ValidationError({"Ошибка": 'Пользователь не найден'})
-        # Изменяем сообщение об ошибке
-        if data.get('confirmation_code') != user.confirmation_code:
-            raise ValidationError({"Ошибка": 'Неверный код подтверждения'})
         return data
 
 

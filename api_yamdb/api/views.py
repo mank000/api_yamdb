@@ -61,23 +61,25 @@ def signup(request):
                 and (existing_user_username.first().email
                      == serializer.validated_data.get("email"))
                 and existing_user_username.first().confirmation_code != ""):
-            return Response({"message": "Пользователь уже зарегистрирован"},
+            return Response(serializer.data,
                             status=status.HTTP_200_OK)
 
         if (existing_user_email.exists()
                 and not existing_user_username.exists()):
-            return Response({"message": "Пользователь уже зарегистрирован"},
+            return Response(serializer.data,
                             status=status.HTTP_400_BAD_REQUEST)
 
         if (existing_user_email or existing_user or existing_user_username):
-            return Response({"message": "Пользователь уже зарегистрирован"},
+            return Response(serializer.data,
                             status=status.HTTP_200_OK)
 
         user = serializer.save()
         confirmation_code = make_confirmation_code()
         user.confirmation_code = confirmation_code
-        sended = send_to_email(serializer.validated_data.get("email"),
-                               confirmation_code)
+        sended = send_to_email(
+            serializer.validated_data.get("email"),
+            confirmation_code
+        )
         user.save()
 
         if sended == 0:

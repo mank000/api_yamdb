@@ -111,7 +111,8 @@ USE_TZ = True
 
 # E-mail
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
 
 # Static files (CSS, JavaScript, Images)
 
