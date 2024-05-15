@@ -4,15 +4,23 @@ from django.core.validators import RegexValidator
 
 from rest_framework.serializers import ValidationError
 
+
 from .const import (
     MAX_LENGTH_TEXT,
     MAX_LENGTH_ROLE,
     MAX_LENGTH_CONFCODE,
     MAX_LENGTH_EMAIL,
-    ROLE_CHOICES,
+    BLOCKED_WORD
 )
+
 from .managers import YamdbUserManager
 
+ROLE_CHOICES = [
+    "admin",
+    "user",
+    "moderator",
+    "super_admin",
+]
 
 ROLE = [
     (ROLE_CHOICES[0], "Администратор"),
@@ -62,6 +70,7 @@ class YamdbUser(AbstractUser):
         default=ROLE_CHOICES[1],
         verbose_name="Роль"
     )
+
     confirmation_code = models.CharField(
         max_length=MAX_LENGTH_CONFCODE,
         default="",
@@ -76,9 +85,8 @@ class YamdbUser(AbstractUser):
         ordering = ("username",)
 
     def validate_username(self, value):
-        if value == "me":
+        if value == BLOCKED_WORD:
             raise ValidationError("'me' нельзя использовать.")
-        return value
 
     def is_admin(self):
         return (self.role == ROLE_CHOICES[0])

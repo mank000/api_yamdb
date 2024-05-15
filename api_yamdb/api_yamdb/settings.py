@@ -8,11 +8,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-AUTH_USER_MODEL = 'users.yamdbuser'
+AUTH_USER_MODEL = 'users.YamdbUser'
 
 INSTALLED_APPS = [
-    'django.contrib.auth',
     'django.contrib.admin',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -44,6 +44,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10
 }
+
 
 ROOT_URLCONF = 'api_yamdb.urls'
 
@@ -91,7 +92,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-LANGUAGE_CODE = 'ru-RU'
+LANGUAGE_CODE = 'en-EN'
 
 TIME_ZONE = 'UTC'
 
@@ -112,3 +113,7 @@ EMAIL_HEAD_LETTER = "Подтверждение регистрации"
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
+
+AUTHENTICATION_BACKENDS = (
+    ('django.contrib.auth.backends.ModelBackend'),
+)
