@@ -10,17 +10,12 @@ from .const import (
     MAX_LENGTH_ROLE,
     MAX_LENGTH_CONFCODE,
     MAX_LENGTH_EMAIL,
-    BLOCKED_WORD
+    BLOCKED_WORD,
+    ROLE_CHOICES
 )
 
 from .managers import YamdbUserManager
 
-ROLE_CHOICES = [
-    "admin",
-    "user",
-    "moderator",
-    "super_admin",
-]
 
 ROLE = [
     (ROLE_CHOICES[0], "Администратор"),
@@ -87,13 +82,16 @@ class YamdbUser(AbstractUser):
     def validate_username(self, value):
         if value == BLOCKED_WORD:
             raise ValidationError("'me' нельзя использовать.")
-
+    
+    @property
     def is_admin(self):
         return (self.role == ROLE_CHOICES[0])
 
+    @property
     def is_user(self):
         return (self.role == ROLE_CHOICES[1])
 
+    @property
     def is_moderator(self):
         return (self.role == ROLE_CHOICES[2])
 
