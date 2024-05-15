@@ -1,7 +1,9 @@
 import csv
 import os
+import sys
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
 from reviews.models import (
@@ -14,6 +16,8 @@ from reviews.models import (
 )
 from users.models import CustomUser
 
+
+User = get_user_model()
 
 CONFORMITY_FILE_TO_CLASS = {
     'category': Category,
@@ -29,7 +33,7 @@ FIELD_TO_KEY = {
     'category': ['category', Category],
     'genre_id': ['genre', Genre],
     'title_id': ['title', Title],
-    'author': ['author', CustomUser]}
+    'author': ['author', User]}
 
 
 def get_static_data_dir():
@@ -51,22 +55,19 @@ def process_row(row, class_name):
 
 def set_field(obj, field, value, class_name):
     if field == 'id':
-        # Проверка уникальности и отсутствия в базе данных.
         if class_name.objects.filter(pk=value).exists():
-            print(f'Объект с id={value} уже существует в базе данных')
+            sys.stdout.write(f'Объект с id={value} уже существует в базе данных\n')
             return False
         setattr(obj, field, value)
     elif field in FIELD_TO_KEY:
-        # Получение данных из связанных моделей.
         try:
             data = FIELD_TO_KEY[field][1].objects.get(pk=value)
         except FIELD_TO_KEY[field][1].DoesNotExist:
-            print(f'Объект с id={value} '
+            sys.stdout.write(f'Объект с id={value}\n'
                   f'не найден в базе данных {FIELD_TO_KEY[field][1]}')
             return False
         setattr(obj, FIELD_TO_KEY[field][0], data)
     else:
-        # Остальные поля таблицы.
         setattr(obj, field, value)
     return True
 
@@ -86,7 +87,7 @@ def upload_data(file_name, class_name):
             try:
                 obj.save()
             except Exception as e:
-                print('Ошибка при загрузке данных '
+                sys.stdout.write('Ошибка при загрузке данных.\n'
                       f'в таблицу {class_name.__name__}: {e}')
 
 

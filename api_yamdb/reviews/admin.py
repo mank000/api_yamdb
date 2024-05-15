@@ -10,24 +10,27 @@ from reviews.models import (
 )
 
 
+admin.site.empty_value_display = '(None)'
+
+@admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     """Класс Admin Category."""
 
     list_display = ("pk", "name", "slug")
     list_filter = ("name",)
     search_fields = ("name",)
-    empty_value_display = "пусто"
 
 
+@admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
     """Класс Admin Genre."""
 
     list_display = ("pk", "name", "slug")
     list_filter = ("name",)
     search_fields = ("name",)
-    empty_value_display = "пусто"
 
 
+@admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
     """Класс Admin Title."""
 
@@ -36,13 +39,18 @@ class TitleAdmin(admin.ModelAdmin):
         "name",
         "year",
         "description",
-        "category"
+        "category",
+        "get_genre"
     )
     list_filter = ("name",)
     search_fields = ("name",)
-    empty_value_display = "пусто"
+    list_editable = ('category',)
+
+    def get_genre(self, object):
+        return '\n'.join((genre.name for genre in object.genre.all()))
 
 
+@admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     """Класс Admin Review."""
 
@@ -54,10 +62,11 @@ class ReviewAdmin(admin.ModelAdmin):
         "pub_date",
         "title"
     )
-    list_filter = ("author", "pub_date")
-    search_fields = ("author",)
+    list_filter = ("author__username", "pub_date")
+    search_fields = ("author__username",)
 
 
+@admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     """Класс Admin Comment."""
 
@@ -68,14 +77,8 @@ class CommentAdmin(admin.ModelAdmin):
         "pub_date",
         "review"
     )
-    list_filter = ("author", "pub_date")
-    search_fields = ("author",)
-    empty_value_display = "пусто"
+    list_filter = ("author__username", "pub_date")
+    search_fields = ("author__username",)
 
 
-admin.site.register(Category, CategoryAdmin)
-admin.site.register(Genre, GenreAdmin)
-admin.site.register(Title, TitleAdmin)
-admin.site.register(Review, ReviewAdmin)
-admin.site.register(Comment, CommentAdmin)
 admin.site.register(GenreTitle)
