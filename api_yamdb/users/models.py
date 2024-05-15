@@ -13,18 +13,10 @@ from .const import (
 from .managers import YamdbUserManager
 
 
-ROLE_CHOICES = [
-    "admin",
-    "user"
-    "moderator"
-    "super_admin"
-]
-
 ROLE_NAMES = [
-    "Администратор",
+    ("Администратор"),
     "Пользователь",
     "Модератор",
-    "Суперпользователь"
 ]
 
 
@@ -86,6 +78,15 @@ class YamdbUser(AbstractUser):
         if value == "me":
             raise ValidationError("'me' нельзя использовать.")
         return value
+
+    def is_admin(self):
+        ...
+
+    def is_user(self):
+        ...
+
+    def is_moderator(self):
+        ...
 
     def __str__(self):
         return self.username
