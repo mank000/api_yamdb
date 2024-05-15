@@ -2,6 +2,8 @@ from django.core.mail import send_mail
 import string
 import random
 
+from api_yamdb.settings import EMAIL_ADRESS, EMAIL_HEAD_LETTER
+
 
 def make_confirmation_code():
     """Возвращает случайную строку из 6 символов."""
@@ -12,9 +14,9 @@ def make_confirmation_code():
 def send_to_email(email, code):
     """Отправляет письмо с кодом подтверждения."""
     return send_mail(
-        'Letter with confirmation code',
+        EMAIL_HEAD_LETTER,
         code,
-        'yamdb@user.com',
+        EMAIL_ADRESS,
         [email],
         fail_silently=False,
     )

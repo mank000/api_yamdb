@@ -8,15 +8,17 @@ from .const import (
     MAX_LENGTH_TEXT,
     MAX_LENGTH_ROLE,
     MAX_LENGTH_CONFCODE,
-    MAX_LENGTH_EMAIL
+    MAX_LENGTH_EMAIL,
+    ROLE_CHOICES,
 )
 from .managers import YamdbUserManager
 
 
-ROLE_NAMES = [
-    ("Администратор"),
-    "Пользователь",
-    "Модератор",
+ROLE = [
+    (ROLE_CHOICES[0], "Администратор"),
+    (ROLE_CHOICES[1], "Пользователь"),
+    (ROLE_CHOICES[2], "Модератор"),
+    (ROLE_CHOICES[3], "Суперадмин")
 ]
 
 
@@ -37,7 +39,6 @@ class YamdbUser(AbstractUser):
     )
 
     email = models.EmailField(
-        'E-mail',
         unique=True,
         max_length=MAX_LENGTH_EMAIL
     )
@@ -56,6 +57,7 @@ class YamdbUser(AbstractUser):
     )
 
     role = models.CharField(
+        choices=ROLE,
         max_length=MAX_LENGTH_ROLE,
         default=ROLE_CHOICES[1],
         verbose_name="Роль"
@@ -73,20 +75,19 @@ class YamdbUser(AbstractUser):
         verbose_name = "Пользователь"
         ordering = ("username",)
 
-    # Проверить!
     def validate_username(self, value):
         if value == "me":
             raise ValidationError("'me' нельзя использовать.")
         return value
 
     def is_admin(self):
-        ...
+        return (self.role == ROLE_CHOICES[0])
 
     def is_user(self):
-        ...
+        return (self.role == ROLE_CHOICES[1])
 
     def is_moderator(self):
-        ...
+        return (self.role == ROLE_CHOICES[2])
 
     def __str__(self):
         return self.username
