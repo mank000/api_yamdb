@@ -1,10 +1,13 @@
 from django.forms import ValidationError
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
-from users.models import CustomUser
+
+
+User = get_user_model()
 
 
 class UserWithoutTokenSerializer(serializers.ModelSerializer):
@@ -14,7 +17,7 @@ class UserWithoutTokenSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=254)
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = ('username', 'email')
 
     def validate_username(self, username):
@@ -23,8 +26,8 @@ class UserWithoutTokenSerializer(serializers.ModelSerializer):
         return username
 
     def validate(self, data):
-        if CustomUser.objects.filter(username=data['username']).exists():
-            user = CustomUser.objects.get(username=data['username'])
+        if User.objects.filter(username=data['username']).exists():
+            user = User.objects.get(username=data['username'])
             if user.email == data['email']:
                 return data
             raise ValidationError({"message": "Неверный email"})
@@ -38,18 +41,18 @@ class UserTokenSerializer(serializers.ModelSerializer):
     confirmation_code = serializers.CharField(required=True)
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = ('username', 'confirmation_code')
 
     def validate_username(self, username):
-        if CustomUser.objects.filter(username=username).exists():
+        if User.objects.filter(username=username).exists():
             return username
         raise Http404('Недопустимое имя пользователя или пользователь'
                       f'`{username}` не найден.')
 
     def validate(self, data):
         # Получаем пользователя по имени пользователя (username)
-        user = CustomUser.objects.filter(username=data.get('username')).first()
+        user = User.objects.filter(username=data.get('username')).first()
         if not user:
             raise ValidationError({"Ошибка": 'Пользователь не найден'})
         return data
@@ -60,15 +63,15 @@ class UsersSerializer(serializers.ModelSerializer):
 
     username = serializers.SlugField(
         max_length=150,
-        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
+        validators=[UniqueValidator(queryset=User.objects.all())]
     )
     email = serializers.EmailField(
         max_length=254,
-        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
+        validators=[UniqueValidator(queryset=User.objects.all())]
     )
 
     class Meta:
-        model = CustomUser
+        model = User
 
         fields = (
             'username', 'email', 'first_name', 'last_name', 'bio', 'role'
