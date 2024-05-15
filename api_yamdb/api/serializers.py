@@ -1,9 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.forms import ValidationError
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+
+from api.const import MAX_LENGTH_EMAIL, MAX_LENGTH_USERNAME
 from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
 from users.models import YamdbUser
 
@@ -13,15 +15,15 @@ User = get_user_model()
 class UserWithoutTokenSerializer(serializers.ModelSerializer):
     """Сериализатор формы регистрации."""
 
-    username = serializers.SlugField(max_length=150)
-    email = serializers.EmailField(max_length=254)
+    username = serializers.SlugField(max_length=MAX_LENGTH_USERNAME)
+    email = serializers.EmailField(max_length=MAX_LENGTH_EMAIL)
 
     class Meta:
         model = YamdbUser
         fields = ('username', 'email')
 
     def validate_username(self, username):
-        if username.lower() == 'me':
+        if username == 'me':
             raise ValidationError({"message": "недопустимый username"})
         return username
 
@@ -37,7 +39,7 @@ class UserWithoutTokenSerializer(serializers.ModelSerializer):
 class UserTokenSerializer(serializers.ModelSerializer):
     """Сериализатор получения JWT-токена."""
 
-    username = serializers.CharField(max_length=150)
+    username = serializers.CharField(max_length=MAX_LENGTH_USERNAME)
     confirmation_code = serializers.CharField(required=True)
 
     class Meta:
@@ -51,7 +53,7 @@ class UserTokenSerializer(serializers.ModelSerializer):
                       f'`{username}` не найден.')
 
     def validate(self, data):
-        # Получаем пользователя по имени пользователя (username)
+        """Получаем пользователя по имени пользователя (username)."""
         user = YamdbUser.objects.filter(username=data.get('username')).first()
         if not user:
             raise ValidationError({"Ошибка": 'Пользователь не найден'})
@@ -62,11 +64,11 @@ class UsersSerializer(serializers.ModelSerializer):
     """Сериализатор кастомной модели User."""
 
     username = serializers.SlugField(
-        max_length=150,
+        max_length=MAX_LENGTH_USERNAME,
         validators=[UniqueValidator(queryset=YamdbUser.objects.all())]
     )
     email = serializers.EmailField(
-        max_length=254,
+        max_length=MAX_LENGTH_EMAIL,
         validators=[UniqueValidator(queryset=YamdbUser.objects.all())]
     )
 
@@ -101,9 +103,6 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleCreateSerializer(serializers.ModelSerializer):
     """Сериализатор создания произведений."""
 
-    name = serializers.CharField(
-        max_length=200,
-    )
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(),
         slug_field='slug',
@@ -131,7 +130,7 @@ class TitleReciveSerializer(serializers.ModelSerializer):
         many=True,
         read_only=True,
     )
-    rating = serializers.FloatField()
+    rating = serializers.IntegerField()
 
     class Meta:
         model = Title
@@ -152,8 +151,8 @@ class GenreTitleSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Отзыва."""
 
-    author = serializers.StringRelatedField(
-        read_only=True
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
     )
 
     class Meta:
@@ -178,7 +177,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Комментария."""
 
-    author = serializers.StringRelatedField(read_only=True)
+    author = serializers.SlugRelatedField(read_only=True,
+                                          slug_field='username')
 
     class Meta:
         model = Comment

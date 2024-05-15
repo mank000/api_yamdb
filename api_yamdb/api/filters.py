@@ -16,9 +16,6 @@ class TitleFilter(filters.FilterSet):
     category = CharFilterInFilter(
         field_name='category__slug', lookup_expr='in'
     )
-    # year = filters.NumberFilter(
-    #     field_name='year',
-    # )
     name = CharFilterInFilter(
         field_name='name', lookup_expr='in'
     )
