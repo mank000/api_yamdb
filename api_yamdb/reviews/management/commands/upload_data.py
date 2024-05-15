@@ -14,7 +14,6 @@ from reviews.models import (
     Review,
     Title
 )
-from users.models import CustomUser
 
 
 User = get_user_model()
@@ -24,7 +23,7 @@ CONFORMITY_FILE_TO_CLASS = {
     'genre': Genre,
     'titles': Title,
     'genre_title': GenreTitle,
-    'users': CustomUser,
+    'users': User,
     'review': Review,
     'comments': Comment
 }
