@@ -9,7 +9,6 @@ from reviews.models import (
     Title,
 )
 
-
 admin.site.empty_value_display = '(None)'
 
 @admin.register(Category)

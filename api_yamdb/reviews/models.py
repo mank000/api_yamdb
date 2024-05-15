@@ -4,8 +4,8 @@ from django.db import models
 
 from reviews.const import (
     DEFAULT_LENGTH_TEXT,
-    MAX_SCORE_VALUE,
     MAX_LEN_NAME_SIZE,
+    MAX_SCORE_VALUE,
     MIN_SCORE_VALUE,
     TITLE_MAX_LEN_SLUG_SIZE,
 )

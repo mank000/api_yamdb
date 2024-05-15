@@ -5,9 +5,10 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from api.const import MAX_LENGTH_EMAIL, MAX_LENGTH_USERNAME
 from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
 from users.models import YamdbUser
+
+from api.const import MAX_LENGTH_EMAIL, MAX_LENGTH_USERNAME
 
 User = get_user_model()
 

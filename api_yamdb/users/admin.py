@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-from .models import YamdbUser
+from users.models import YamdbUser
 
 
 class YamdbUserAdmin(UserAdmin):

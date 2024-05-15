@@ -1,35 +1,31 @@
-from django.shortcuts import get_object_or_404
-from rest_framework.decorators import action
-from rest_framework.filters import SearchFilter
-from rest_framework.response import Response
 from django.db.models import Avg
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action, api_view
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.decorators import api_view
+
+from reviews.models import Category, Genre, Review, Title
+from users.models import YamdbUser
 
 from api.filters import TitleFilter
-from reviews.models import Category, Genre, Title, Review
-from users.models import YamdbUser
-from api.permissions import (
-    ChangeAdminOnly, StaffOrReadOnly, AuthorOrStaffOrReadOnly
-)
-
-
 from api.mixins import ModelMixinSet
+from api.permissions import AuthorOrStaffOrReadOnly, ChangeAdminOnly, StaffOrReadOnly
 from api.serializers import (
-    UsersSerializer,
     CategorySerializer,
-    GenreSerializer,
-    TitleReciveSerializer,
-    TitleCreateSerializer,
-    ReviewSerializer,
     CommentSerializer,
-    UserWithoutTokenSerializer,
+    GenreSerializer,
+    ReviewSerializer,
+    TitleCreateSerializer,
+    TitleReciveSerializer,
+    UsersSerializer,
     UserTokenSerializer,
+    UserWithoutTokenSerializer,
 )
-from api.utils import send_to_email, make_confirmation_code
+from api.utils import make_confirmation_code, send_to_email
 
 
 @api_view(['POST'])
@@ -162,8 +158,8 @@ class GenreViewSet(ModelMixinSet):
 class TitleViewSet(viewsets.ModelViewSet):
     """Представление для работы с моделью титл."""
 
-    queryset = Title.objects.all()
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    ordering_fields = ('name', 'year', 'category__slug', 'rating')
     filterset_class = TitleFilter
     permission_classes = (StaffOrReadOnly,)
     pagination_class = LimitOffsetPagination
@@ -171,7 +167,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_queryset(self):
-        return Title.objects.annotate(rating=Avg('reviews__score'))
+        return Title.objects.annotate(rating=Avg('reviews__score')).order_by('-rating')
 
     def get_serializer_class(self):
         """Переопределяем метод для чтения и создания."""

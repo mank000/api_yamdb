@@ -1,6 +1,7 @@
-from django.core.mail import send_mail
-import string
 import random
+import string
+
+from django.core.mail import send_mail
 
 from api_yamdb.settings import EMAIL_ADRESS, EMAIL_HEAD_LETTER
 

@@ -1,21 +1,17 @@
 from django.contrib.auth.models import AbstractUser
-from django.db import models
 from django.core.validators import RegexValidator
-
+from django.db import models
 from rest_framework.serializers import ValidationError
 
-
-from .const import (
-    MAX_LENGTH_TEXT,
-    MAX_LENGTH_ROLE,
+from users.const import (
+    BLOCKED_WORD,
     MAX_LENGTH_CONFCODE,
     MAX_LENGTH_EMAIL,
-    BLOCKED_WORD,
-    ROLE_CHOICES
+    MAX_LENGTH_ROLE,
+    MAX_LENGTH_TEXT,
+    ROLE_CHOICES,
 )
-
-from .managers import YamdbUserManager
-
+from users.managers import YamdbUserManager
 
 ROLE = [
     (ROLE_CHOICES[0], "Администратор"),
