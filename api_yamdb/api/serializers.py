@@ -111,6 +111,8 @@ class TitleCreateSerializer(serializers.ModelSerializer):
         queryset=Genre.objects.all(),
         slug_field='slug',
         many=True,
+        required=True,
+        allow_null=False,
     )
 
     class Meta:
