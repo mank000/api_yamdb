@@ -1,10 +1,13 @@
 from django.forms import ValidationError
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
 from users.models import YamdbUser
+
+User = get_user_model()
 
 
 class UserWithoutTokenSerializer(serializers.ModelSerializer):
@@ -23,8 +26,8 @@ class UserWithoutTokenSerializer(serializers.ModelSerializer):
         return username
 
     def validate(self, data):
-        if YamdbUser.objects.filter(username=data['username']).exists():
-            user = YamdbUser.objects.get(username=data['username'])
+        if User.objects.filter(username=data['username']).exists():
+            user = User.objects.get(username=data['username'])
             if user.email == data['email']:
                 return data
             raise ValidationError({"message": "Неверный email"})
