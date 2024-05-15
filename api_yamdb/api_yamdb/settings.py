@@ -2,25 +2,13 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs'
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-REST_FRAMEWORK = {
-
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10
-}
-
-
-# Application definition
+AUTH_USER_MODEL = 'users.YamdbUser'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -31,9 +19,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'reviews.apps.ReviewsConfig',
     'users.apps.UsersConfig',
-    'api.apps.ApiConfig'
+    'reviews.apps.ReviewsConfig',
+    'api.apps.ApiConfig',
 ]
 
 
@@ -46,6 +34,17 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+REST_FRAMEWORK = {
+
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 10
+}
+
 
 ROOT_URLCONF = 'api_yamdb.urls'
 
@@ -69,8 +68,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'api_yamdb.wsgi.application'
 
 
-# Database
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -78,8 +75,6 @@ DATABASES = {
     }
 }
 
-
-# Password validation
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -97,9 +92,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-EN'
 
 TIME_ZONE = 'UTC'
 
@@ -109,16 +102,18 @@ USE_L10N = True
 
 USE_TZ = True
 
-# E-mail
+EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
 
-# Static files (CSS, JavaScript, Images)
+EMAIL_ADRESS = "yamdb@user.com"
+
+EMAIL_HEAD_LETTER = "Подтверждение регистрации"
 
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
-# Custom user
-AUTH_USER_MODEL = 'users.CustomUser'
+AUTHENTICATION_BACKENDS = (
+    ('django.contrib.auth.backends.ModelBackend'),
+)

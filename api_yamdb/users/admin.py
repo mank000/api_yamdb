@@ -1,12 +1,13 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
+
+from .models import YamdbUser
 
 
-class CustomUserAdmin(UserAdmin):
+class YamdbUserAdmin(UserAdmin):
     fieldsets = UserAdmin.fieldsets + (
         ('Дополнительная информация', {'fields': ('role', 'bio')}),
     )
 
 
-admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(YamdbUser, YamdbUserAdmin)

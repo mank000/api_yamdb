@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
-
+from users.models import YamdbUser
 
 User = get_user_model()
 
@@ -17,7 +17,7 @@ class UserWithoutTokenSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=254)
 
     class Meta:
-        model = User
+        model = YamdbUser
         fields = ('username', 'email')
 
     def validate_username(self, username):
@@ -41,18 +41,18 @@ class UserTokenSerializer(serializers.ModelSerializer):
     confirmation_code = serializers.CharField(required=True)
 
     class Meta:
-        model = User
+        model = YamdbUser
         fields = ('username', 'confirmation_code')
 
     def validate_username(self, username):
-        if User.objects.filter(username=username).exists():
+        if YamdbUser.objects.filter(username=username).exists():
             return username
         raise Http404('Недопустимое имя пользователя или пользователь'
                       f'`{username}` не найден.')
 
     def validate(self, data):
         # Получаем пользователя по имени пользователя (username)
-        user = User.objects.filter(username=data.get('username')).first()
+        user = YamdbUser.objects.filter(username=data.get('username')).first()
         if not user:
             raise ValidationError({"Ошибка": 'Пользователь не найден'})
         return data
@@ -63,15 +63,15 @@ class UsersSerializer(serializers.ModelSerializer):
 
     username = serializers.SlugField(
         max_length=150,
-        validators=[UniqueValidator(queryset=User.objects.all())]
+        validators=[UniqueValidator(queryset=YamdbUser.objects.all())]
     )
     email = serializers.EmailField(
         max_length=254,
-        validators=[UniqueValidator(queryset=User.objects.all())]
+        validators=[UniqueValidator(queryset=YamdbUser.objects.all())]
     )
 
     class Meta:
-        model = User
+        model = YamdbUser
 
         fields = (
             'username', 'email', 'first_name', 'last_name', 'bio', 'role'
