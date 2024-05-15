@@ -1,7 +1,7 @@
 from django.contrib.auth.base_user import BaseUserManager
 
 
-class CustomUserManager(BaseUserManager):
+class YamdbUserManager(BaseUserManager):
     """Переопределяем создание пользователя."""
 
     def create_user(self, username, email, **extra_fields):

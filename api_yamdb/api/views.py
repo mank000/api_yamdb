@@ -11,7 +11,7 @@ from rest_framework.decorators import api_view
 
 from api.filters import TitleFilter
 from reviews.models import Category, Genre, Title, Review
-from users.models import CustomUser
+from users.models import YamdbUser
 from api.permissions import (
     ChangeAdminOnly, StaffOrReadOnly, AuthorOrStaffOrReadOnly
 )
@@ -37,13 +37,13 @@ def signup(request):
 
     if (serializer.is_valid()):
 
-        existing_user_username = CustomUser.objects.filter(
+        existing_user_username = YamdbUser.objects.filter(
             username=serializer.validated_data.get('username'))
 
-        existing_user_email = CustomUser.objects.filter(
+        existing_user_email = YamdbUser.objects.filter(
             email=serializer.validated_data.get('email'))
 
-        existing_user = CustomUser.objects.filter(
+        existing_user = YamdbUser.objects.filter(
             username=serializer.validated_data.get('username'),
             email=serializer.validated_data.get('email'))
 
@@ -98,7 +98,7 @@ def get_token(request):
     seralizer = UserTokenSerializer(data=request.data)
     if seralizer.is_valid():
         user = get_object_or_404(
-            CustomUser,
+            YamdbUser,
             username=seralizer.validated_data.get("username")
         )
         if (user.confirmation_code
@@ -119,7 +119,7 @@ def get_token(request):
 class UserViewSet(viewsets.ModelViewSet):
     """Работа с пользователями."""
 
-    queryset = CustomUser.objects.all()
+    queryset = YamdbUser.objects.all()
     serializer_class = UsersSerializer
     permission_classes = (ChangeAdminOnly,)
     search_fields = ("username",)

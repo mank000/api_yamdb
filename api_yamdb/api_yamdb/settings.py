@@ -121,4 +121,4 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
 # Custom user
-AUTH_USER_MODEL = 'users.CustomUser'
+AUTH_USER_MODEL = 'users.YamdbUser'

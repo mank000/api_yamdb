@@ -2,22 +2,38 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import RegexValidator
 
-from .managers import CustomUserManager
+from rest_framework.serializers import ValidationError
+
+from .const import (
+    MAX_LENGTH_TEXT,
+    MAX_LENGTH_ROLE,
+    MAX_LENGTH_CONFCODE,
+    MAX_LENGTH_EMAIL
+)
+from .managers import YamdbUserManager
 
 
-class CustomUser(AbstractUser):
+ROLE_CHOICES = [
+    "admin",
+    "user"
+    "moderator"
+    "super_admin"
+]
+
+ROLE_NAMES = [
+    "Администратор",
+    "Пользователь",
+    "Модератор",
+    "Суперпользователь"
+]
+
+
+class YamdbUser(AbstractUser):
     """Переопределяем модель стандартного юзера."""
-
-    ROLE_CHOICES = [
-        ("admin", "Администратор"),
-        ("user", "Пользователь"),
-        ("moderator", "Модератор"),
-        ("super_admin", "Суперпользователь")
-    ]
 
     username = models.CharField(
         verbose_name='Username',
-        max_length=150,
+        max_length=MAX_LENGTH_TEXT,
         unique=True,
         validators=[
             RegexValidator(
@@ -28,35 +44,48 @@ class CustomUser(AbstractUser):
         ],
     )
 
-    email = models.EmailField('E-mail',
-                              unique=True,
-                              max_length=254
-                              )
+    email = models.EmailField(
+        'E-mail',
+        unique=True,
+        max_length=MAX_LENGTH_EMAIL
+    )
 
-    first_name = models.CharField(verbose_name='Имя',
-                                  max_length=150
-                                  )
+    first_name = models.CharField(
+        max_length=MAX_LENGTH_TEXT
+    )
 
-    last_name = models.CharField(verbose_name='Фамилия',
-                                 max_length=150
-                                 )
+    last_name = models.CharField(
+        max_length=MAX_LENGTH_TEXT
+    )
 
-    bio = models.TextField(blank=True,
-                           verbose_name="О себе"
-                           )
+    bio = models.TextField(
+        blank=True,
+        verbose_name="О себе"
+    )
 
-    role = models.CharField(max_length=20,
-                            choices=ROLE_CHOICES,
-                            default="user",
-                            verbose_name="Роль"
-                            )
-    confirmation_code = models.CharField(max_length=6,
-                                         default="",
-                                         blank=True,
-                                         verbose_name="Код подтверждения"
-                                         )
+    role = models.CharField(
+        max_length=MAX_LENGTH_ROLE,
+        default=ROLE_CHOICES[1],
+        verbose_name="Роль"
+    )
+    confirmation_code = models.CharField(
+        max_length=MAX_LENGTH_CONFCODE,
+        default="",
+        blank=True,
+        verbose_name="Код подтверждения"
+    )
 
-    objects = CustomUserManager()
+    objects = YamdbUserManager()
+
+    class Meta:
+        verbose_name = "Пользователь"
+        ordering = ("username",)
+
+    # Проверить!
+    def validate_username(self, value):
+        if value == "me":
+            raise ValidationError("'me' нельзя использовать.")
+        return value
 
     def __str__(self):
         return self.username
