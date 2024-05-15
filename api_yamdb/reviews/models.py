@@ -33,6 +33,7 @@ class CategoryGenreModel(models.Model):
     def __str__(self):
         return self.name[:DEFAULT_LENGTH_TEXT]
     
+
 class CommentReviewModel(models.Model):
     """Абстрактный класс для даты комментариев и отзывов."""
 
@@ -40,7 +41,7 @@ class CommentReviewModel(models.Model):
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="reviews",
+        related_name="%(app_label)s_%(class)s_related",
         verbose_name="Aвтор"
     )
     pub_date = models.DateTimeField(
@@ -53,7 +54,7 @@ class CommentReviewModel(models.Model):
         abstract = True
 
     def __str__(self):
-        return self.text
+        return self.text[:DEFAULT_LENGTH_TEXT]
 
 
 class Category(CategoryGenreModel):
@@ -104,7 +105,7 @@ class Title(models.Model):
         ordering = ("-year", "name")
 
     def __str__(self):
-        return self.name
+        return self.name[:DEFAULT_LENGTH_TEXT]
 
 
 class GenreTitle(models.Model):
@@ -154,16 +155,12 @@ class Review(CommentReviewModel):
     class Meta:
         verbose_name = "отзыв"
         verbose_name_plural = "Отзывы"
-        ordering = ("-pub_date",)
         constraints = (
             models.UniqueConstraint(
                 fields=["author", "title"],
                 name="unique_author_title"
             ),
         )
-
-    def __str__(self):
-        return self.text
 
 
 class Comment(CommentReviewModel):
@@ -179,7 +176,3 @@ class Comment(CommentReviewModel):
     class Meta:
         verbose_name = "комментарий"
         verbose_name_plural = "Комментарии"
-        ordering = ("-pub_date",)
-
-    def __str__(self):
-        return self.text
