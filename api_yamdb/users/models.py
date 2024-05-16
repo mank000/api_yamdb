@@ -77,12 +77,14 @@ class YamdbUser(AbstractUser):
 
     class Meta:
         verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
         ordering = ("username",)
 
     def validate_username(self, value):
         if value == BLOCKED_WORD:
             raise ValidationError("'me' нельзя использовать.")
-    
+        return value
+
     @property
     def is_admin(self):
         return (self.role == ROLE_CHOICES[0])
