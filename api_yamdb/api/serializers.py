@@ -137,11 +137,24 @@ class TitleReciveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = '__all__'
+        fields = ("__all__")
         read_only_fields = (
             'id', 'name', 'year', 'rating', 'description',
         )
 
+    def to_representation(self, instance):
+        """Метод для определения формата вывода данных."""
+        request = self.context.get('request')
+        if request or 'title_id' in request.query_params:
+            return {
+                'id': instance.id,
+                'name': instance.name,
+                'year': instance.year,
+                'rating': instance.rating,
+                'description': instance.description,
+                'genre': GenreSerializer(instance.genre, many=True).data,
+                'category': CategorySerializer(instance.category).data
+            }
 
 class GenreTitleSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Соответствия жанра и произведения."""
