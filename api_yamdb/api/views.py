@@ -13,7 +13,11 @@ from users.models import YamdbUser
 
 from api.filters import TitleFilter
 from api.mixins import ModelMixinSet
-from api.permissions import AuthorOrStaffOrReadOnly, ChangeAdminOnly, StaffOrReadOnly
+from api.permissions import (
+    AuthorOrStaffOrReadOnly,
+    ChangeAdminOnly,
+    StaffOrReadOnly
+)
 from api.serializers import (
     CategorySerializer,
     CommentSerializer,
@@ -32,25 +36,26 @@ from api.utils import make_confirmation_code, send_to_email
 def signup(request):
     serializer = UserWithoutTokenSerializer(data=request.data)
 
-    if (serializer.is_valid()):
+    if serializer.is_valid(raise_exception=True):
+        
+        username = serializer.validated_data.get("username")
+        email = serializer.validated_data.get("email")
 
         existing_user_username = YamdbUser.objects.filter(
-            username=serializer.validated_data.get('username'))
+            username=username)
 
         existing_user_email = YamdbUser.objects.filter(
-            email=serializer.validated_data.get('email'))
+            email=email)
 
         existing_user = YamdbUser.objects.filter(
-            username=serializer.validated_data.get('username'),
-            email=serializer.validated_data.get('email'))
+            username=username,
+            email=email)
+        
+        # тут повторная отправка письма без создания пользователя.
 
-        if (existing_user_username
-            and (existing_user_username.first().username
-                 == serializer.validated_data.get("username"))
-                and (existing_user_username.first().email
-                     != serializer.validated_data.get("email"))):
-            return Response({"message": "Пользователь уже зарегистрирован"},
-                            status=status.HTTP_400_BAD_REQUEST)
+        if (existing_user_email or existing_user or existing_user_username):
+            return Response(serializer.data,
+                            status=status.HTTP_200_OK)
 
         if (existing_user_username
                 and (existing_user_username.first().username
@@ -58,17 +63,17 @@ def signup(request):
                 and (existing_user_username.first().email
                      == serializer.validated_data.get("email"))
                 and existing_user_username.first().confirmation_code != ""):
-            return Response(serializer.data,
-                            status=status.HTTP_200_OK)
-
-        if (existing_user_email.exists()
-                and not existing_user_username.exists()):
-            return Response(serializer.data,
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        if (existing_user_email or existing_user or existing_user_username):
-            return Response(serializer.data,
-                            status=status.HTTP_200_OK)
+                
+                    user = existing_user.first()
+                    confirmation_code = make_confirmation_code()
+                    user.confirmation_code = confirmation_code
+                    sended = send_to_email(
+                        user.email,
+                        confirmation_code
+                    )
+                    user.save()
+                    return Response(serializer.data,
+                                status=status.HTTP_200_OK)
 
         user = serializer.save()
         confirmation_code = make_confirmation_code()
@@ -93,7 +98,7 @@ def signup(request):
 @api_view(['POST'])
 def get_token(request):
     seralizer = UserTokenSerializer(data=request.data)
-    if seralizer.is_valid():
+    if seralizer.is_valid(raise_exception=True):
         user = get_object_or_404(
             YamdbUser,
             username=seralizer.validated_data.get("username")
@@ -167,7 +172,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_queryset(self):
-        return Title.objects.annotate(rating=Avg('reviews__score')).order_by('-rating')
+        return Title.objects.annotate(
+            rating=Avg('reviews__score')).order_by('-rating')
 
     def get_serializer_class(self):
         """Переопределяем метод для чтения и создания."""

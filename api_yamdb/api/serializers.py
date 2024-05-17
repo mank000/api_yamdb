@@ -29,12 +29,37 @@ class UserWithoutTokenSerializer(serializers.ModelSerializer):
         return username
 
     def validate(self, data):
-        if User.objects.filter(username=data['username']).exists():
-            user = User.objects.get(username=data['username'])
-            if user.email == data['email']:
-                return data
-            raise ValidationError({"message": "Неверный email"})
+        
+        username = data.get("username")
+        email = data.get("email")
+
+        existing_user_username = YamdbUser.objects.filter(
+            username=username)
+
+        existing_user_email = YamdbUser.objects.filter(
+            email=email)
+
+        if (existing_user_username
+            and (existing_user_username.first().username
+                 == username)
+                and (existing_user_username.first().email
+                     != email)):
+            raise ValidationError(
+                {"username": "Пользователь с таким email уже существует"})
+
+        if (existing_user_email.exists()
+                and not existing_user_username.exists()):
+            raise ValidationError(
+                {"email": "Пользователь с таким username уже существует"}
+            )
+
+        if (existing_user_email.first() != existing_user_username.first()):
+            raise ValidationError(
+                {"Пользователь": "С такими данными существует"}
+            )
         return data
+    
+        
 
 
 class UserTokenSerializer(serializers.ModelSerializer):
