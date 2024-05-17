@@ -1,4 +1,4 @@
-Api_yamdb
+# _Api_yamdb_
 ### О проекте
 
 Данный проект является api-сервисом для проекта api_yamdb
@@ -9,10 +9,13 @@ Api_yamdb
 Добавлять отзывы, комментарии и ставить оценки могут только аутентифицированные пользователи.
 
 ### Технологии
-- Python
-- Django
-- DRF
-- Simple-jwt
+- ![Static Badge](https://img.shields.io/badge/Python%203.9-blue)
+
+- ![Static Badge](https://img.shields.io/badge/django%20version%203.2-8A2BE2)
+- ![Static Badge](https://img.shields.io/badge/djangorestframework%203.12-8A2BE2)
+
+- ![Static Badge](https://img.shields.io/badge/djangorestframework-simplejwt%3D%3D5.3-8A2BE2)
+
 
 ### Как запустить проект:
 
@@ -47,6 +50,9 @@ pip install -r requirements.txt
 ```
 
 - Выполнить миграции:
+```
+python manage.py makemigrations
+```
 
 ```
 python manage.py migrate
@@ -62,6 +68,10 @@ python manage.py runserver
 ```
 http://localhost/
 ```
+- Для загрузки данных есть  собственная management-команда:
+```
+python upload_data.py
+```
 
 ### Примеры обращений к API Yatube
 
@@ -70,7 +80,41 @@ http://localhost/
 ```
 http://127.0.0.1:8000/redoc/
 ```
+
 По данной ссылке есть все необходимые эндпоинты и описание.
+Каждый ресурс описан в документации: указаны эндпоинты (адреса, по которым можно сделать запрос), разрешённые типы запросов, права доступа и дополнительные параметры, если это необходимо.
 
+### Ресурсы API YaMDb и примеры запросов
++ Ресурс **auth**: аутентификация.
+```
+    http://127.0.0.1:8000/api/v1/auth/signup/
+```
++ Ресурс **users**: пользователи.
+```
+    http://127.0.0.1:8000/api/v1/users/
+```
++ Ресурс **titles**: произведения, к которым пишут отзывы (определённый фильм, книга или песенка).
+```
+    http://127.0.0.1:8000/api/v1/titles/
+```
++ Ресурс **categories**: категории (типы) произведений («Фильмы», «Книги», «Музыка»).
+```
+    http://127.0.0.1:8000/api/v1/categories/
+```
++ Ресурс **genres**: жанры произведений. Одно произведение может быть привязано к нескольким жанрам.
+```
+    http://127.0.0.1:8000/api/v1/genres/
+```
++ Ресурс **reviews**: отзывы на произведения. Отзыв привязан к определённому произведению.
+```
+    http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/
+```
++ Ресурс **comments**: комментарии к отзывам. Комментарий привязан к определённому отзыву.
+```
+    http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/{review_id}/comments/
+```
 
-
+### Разработчики проекта
++ [Артём](https://github.com/mank000)
++ [Андрей](https://github.com/AndreyMZyrianov)
++ [Людмила](https://github.com/ZozulyaL)
