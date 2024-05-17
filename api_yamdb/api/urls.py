@@ -8,8 +8,8 @@ from api.views import (
     ReviewViewSet,
     TitleViewSet,
     UserViewSet,
-    get_token,
-    signup,
+    GetTokenView,
+    SignView,
 )
 
 router_v1 = DefaultRouter()
@@ -41,8 +41,8 @@ router_v1.register(
 )
 
 authpatterns = [
-    path("signup/", signup, name='signup'),
-    path("token/", get_token, name='get_token'),
+    path("signup/", SignView.as_view(), name='signup'),
+    path("token/", GetTokenView.as_view(), name='get_token'),
 ]
 
 urlpatterns = [

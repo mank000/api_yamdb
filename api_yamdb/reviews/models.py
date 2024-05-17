@@ -16,7 +16,7 @@ User = get_user_model()
 
 class CategoryGenreModel(models.Model):
     """Абстрактный класс для категорий и жанров."""
-    
+
     name = models.CharField(
         max_length=MAX_LEN_NAME_SIZE,
         verbose_name="Hазвание",
@@ -29,10 +29,10 @@ class CategoryGenreModel(models.Model):
     class Meta:
         ordering = ("name",)
         abstract = True
-    
+
     def __str__(self):
         return self.name[:DEFAULT_LENGTH_TEXT]
-    
+
 
 class CommentReviewModel(models.Model):
     """Абстрактный класс для даты комментариев и отзывов."""

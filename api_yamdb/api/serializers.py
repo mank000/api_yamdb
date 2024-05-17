@@ -4,8 +4,16 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
+from reviews.models import (
+    Category,
+    Comment,
+    Genre,
+    GenreTitle,
+    Review,
+    Title
+)
 from users.models import YamdbUser
 
 from api.const import MAX_LENGTH_EMAIL, MAX_LENGTH_USERNAME
@@ -29,7 +37,7 @@ class UserWithoutTokenSerializer(serializers.ModelSerializer):
         return username
 
     def validate(self, data):
-        
+
         username = data.get("username")
         email = data.get("email")
 
@@ -58,8 +66,6 @@ class UserWithoutTokenSerializer(serializers.ModelSerializer):
                 {"Пользователь": "С такими данными существует"}
             )
         return data
-    
-        
 
 
 class UserTokenSerializer(serializers.ModelSerializer):
@@ -79,11 +85,16 @@ class UserTokenSerializer(serializers.ModelSerializer):
                       f'`{username}` не найден.')
 
     def validate(self, data):
-        """Получаем пользователя по имени пользователя (username)."""
-        user = YamdbUser.objects.filter(username=data.get('username')).first()
-        if not user:
-            raise ValidationError({"Ошибка": 'Пользователь не найден'})
-        return data
+        user = get_object_or_404(
+            YamdbUser,
+            username=data.get("username")
+        )
+        if user.confirmation_code == data.get("confirmation_code"):
+            refresh = RefreshToken.for_user(user)
+            user.confirmation_code = ''
+            user.save()
+            return {"token": refresh.access_token}
+        raise ValidationError({'error': 'Неправильный код!'})
 
 
 class UsersSerializer(serializers.ModelSerializer):

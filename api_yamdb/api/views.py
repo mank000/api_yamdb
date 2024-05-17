@@ -2,11 +2,11 @@ from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.views import APIView
 
 from reviews.models import Category, Genre, Review, Title
 from users.models import YamdbUser
@@ -29,93 +29,93 @@ from api.serializers import (
     UserTokenSerializer,
     UserWithoutTokenSerializer,
 )
-from api.utils import make_confirmation_code, send_to_email
+from api.utils import (
+    make_confirmation_code,
+    send_to_email
+)
 
 
-@api_view(['POST'])
-def signup(request):
-    serializer = UserWithoutTokenSerializer(data=request.data)
+class SignView(APIView):
 
-    if serializer.is_valid(raise_exception=True):
-        
-        username = serializer.validated_data.get("username")
-        email = serializer.validated_data.get("email")
+    def post(self, request):
+        serializer = UserWithoutTokenSerializer(data=request.data)
 
-        existing_user_username = YamdbUser.objects.filter(
-            username=username)
+        if serializer.is_valid(raise_exception=True):
 
-        existing_user_email = YamdbUser.objects.filter(
-            email=email)
+            username = serializer.validated_data.get("username")
+            email = serializer.validated_data.get("email")
 
-        existing_user = YamdbUser.objects.filter(
-            username=username,
-            email=email)
-        
-        # тут повторная отправка письма без создания пользователя.
+            existing_user_username = YamdbUser.objects.filter(
+                username=username
+            )
 
-        if (existing_user_email or existing_user or existing_user_username):
-            return Response(serializer.data,
-                            status=status.HTTP_200_OK)
+            existing_user = YamdbUser.objects.filter(
+                username=username,
+                email=email
+            )
 
-        if (existing_user_username
-                and (existing_user_username.first().username
-                     == serializer.validated_data.get("username"))
-                and (existing_user_username.first().email
-                     == serializer.validated_data.get("email"))
-                and existing_user_username.first().confirmation_code != ""):
-                
-                    user = existing_user.first()
-                    confirmation_code = make_confirmation_code()
-                    user.confirmation_code = confirmation_code
-                    sended = send_to_email(
-                        user.email,
-                        confirmation_code
-                    )
-                    user.save()
-                    return Response(serializer.data,
+            if existing_user:
+                user = existing_user.first()
+                confirmation_code = make_confirmation_code()
+                user.confirmation_code = confirmation_code
+                sended = send_to_email(
+                    user.email,
+                    confirmation_code
+                )
+                user.save()
+                return Response(serializer.data,
                                 status=status.HTTP_200_OK)
 
-        user = serializer.save()
-        confirmation_code = make_confirmation_code()
-        user.confirmation_code = confirmation_code
-        sended = send_to_email(
-            serializer.validated_data.get("email"),
-            confirmation_code
-        )
-        user.save()
+            if (existing_user_username
+                    and (existing_user_username.first().username
+                         == serializer.validated_data.get("username"))
+                    and (existing_user_username.first().email
+                         == serializer.validated_data.get("email"))):
+                user = existing_user.first()
+                confirmation_code = make_confirmation_code()
+                user.confirmation_code = confirmation_code
+                sended = send_to_email(
+                    user.email,
+                    confirmation_code
+                )
+                user.save()
+                return Response(
+                    serializer.data,
+                    status=status.HTTP_200_OK
+                )
 
-        if sended == 0:
-            return Response({"error": "Ошибка отправки письма. "
-                             "Свяжитесь с администратором"},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(serializer.data,
-                        status=status.HTTP_200_OK)
-    return Response(serializer.errors,
-                    status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['POST'])
-def get_token(request):
-    seralizer = UserTokenSerializer(data=request.data)
-    if seralizer.is_valid(raise_exception=True):
-        user = get_object_or_404(
-            YamdbUser,
-            username=seralizer.validated_data.get("username")
-        )
-        if (user.confirmation_code
-                == seralizer.validated_data.get("confirmation_code")):
-            refresh = RefreshToken.for_user(user)
-            user.confirmation_code = ''
+            user = serializer.save()
+            confirmation_code = make_confirmation_code()
+            user.confirmation_code = confirmation_code
+            sended = send_to_email(
+                serializer.validated_data.get("email"),
+                confirmation_code
+            )
             user.save()
-            return Response({'token': str(refresh.access_token)},
-                            status=status.HTTP_200_OK)
-        else:
-            return Response({'error': 'Неправильный код!'},
-                            status=status.HTTP_400_BAD_REQUEST)
 
-    else:
-        return Response(seralizer.errors, status=status.HTTP_400_BAD_REQUEST)
+            if sended == 0:
+                return Response({"error": "Ошибка отправки письма. "
+                                "Свяжитесь с администратором"},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            return Response(serializer.data,
+                            status=status.HTTP_200_OK)
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetTokenView(APIView):
+    def post(self, request):
+        serializer = UserTokenSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            return Response(
+                serializer.validated_data,
+                status=status.HTTP_200_OK
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 
 class UserViewSet(viewsets.ModelViewSet):

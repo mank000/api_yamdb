@@ -55,7 +55,9 @@ def process_row(row, class_name):
 def set_field(obj, field, value, class_name):
     if field == 'id':
         if class_name.objects.filter(pk=value).exists():
-            sys.stdout.write(f'Объект с id={value} уже существует в базе данных\n')
+            sys.stdout.write(
+                f'Объект с id={value} уже существует в базе данных\n'
+            )
             return False
         setattr(obj, field, value)
     elif field in FIELD_TO_KEY:
@@ -63,7 +65,8 @@ def set_field(obj, field, value, class_name):
             data = FIELD_TO_KEY[field][1].objects.get(pk=value)
         except FIELD_TO_KEY[field][1].DoesNotExist:
             sys.stdout.write(f'Объект с id={value}\n'
-                  f'не найден в базе данных {FIELD_TO_KEY[field][1]}')
+                             'не найден в базе данных '
+                             f'{FIELD_TO_KEY[field][1]}')
             return False
         setattr(obj, FIELD_TO_KEY[field][0], data)
     else:
@@ -87,7 +90,7 @@ def upload_data(file_name, class_name):
                 obj.save()
             except Exception as e:
                 sys.stdout.write('Ошибка при загрузке данных.\n'
-                      f'в таблицу {class_name.__name__}: {e}')
+                                 f'в таблицу {class_name.__name__}: {e}')
 
 
 class Command(BaseCommand):

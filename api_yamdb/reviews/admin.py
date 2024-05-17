@@ -11,6 +11,7 @@ from reviews.models import (
 
 admin.site.empty_value_display = '(None)'
 
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     """Класс Admin Category."""
@@ -43,11 +44,11 @@ class TitleAdmin(admin.ModelAdmin):
     )
     list_filter = ("name",)
     search_fields = ("name",)
-    list_editable = ('category',)
+    list_editable = ("category",)
 
     def get_genre(self, object):
         return ', '.join((genre.name for genre in object.genre.all()))
-    
+
     get_genre.short_description = 'Жанр произведения'
 
 
