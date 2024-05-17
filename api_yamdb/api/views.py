@@ -36,6 +36,7 @@ from api.utils import (
 
 
 class SignView(APIView):
+    """Работа с регистрицей пользователя."""
 
     def post(self, request):
         serializer = UserWithoutTokenSerializer(data=request.data)
@@ -105,6 +106,8 @@ class SignView(APIView):
 
 
 class GetTokenView(APIView):
+    """Работа с токенами пользователей."""
+
     def post(self, request):
         serializer = UserTokenSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
