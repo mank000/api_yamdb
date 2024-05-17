@@ -192,6 +192,7 @@ class TitleReciveSerializer(serializers.ModelSerializer):
                 'category': CategorySerializer(instance.category).data
             }
 
+
 class GenreTitleSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Соответствия жанра и произведения."""
 
