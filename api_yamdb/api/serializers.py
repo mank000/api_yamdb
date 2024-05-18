@@ -93,7 +93,7 @@ class UserTokenSerializer(serializers.ModelSerializer):
             refresh = RefreshToken.for_user(user)
             user.confirmation_code = ''
             user.save()
-            return {"token": refresh.access_token}
+            return {"token": str(refresh.access_token)}
         raise ValidationError({'error': 'Неправильный код!'})
 
 
@@ -159,21 +159,8 @@ class TitleCreateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         """Метод для определения формата вывода данных."""
-        request = self.context.get('request')
-        if request and request.method in ['POST', 'PUT'] and request.user.is_staff:
-            return {
-                'id': instance.id,
-                'name': instance.name,
-                'year': instance.year,
-                'rating': instance.rating,
-                'description': instance.description,
-                'genre': GenreSerializer(instance.genre, many=True).data,
-                'category': CategorySerializer(instance.category).data
-            }
-        
-        # Возвращаем ожидаемый формат данных для обычных запросов
-        return super().to_representation(instance)
-
+        serializers = TitleReciveSerializer(instance)
+        return serializers.data
 
 
 class TitleReciveSerializer(serializers.ModelSerializer):
@@ -190,7 +177,9 @@ class TitleReciveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = "__all__"
+        fields = (
+            'id', 'name', 'year', 'rating', 'description', "genre", "category",
+        )
         read_only_fields = (
             'id', 'name', 'year', 'rating', 'description',
         )

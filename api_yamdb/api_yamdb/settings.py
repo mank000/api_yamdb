@@ -117,3 +117,9 @@ STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 AUTHENTICATION_BACKENDS = (
     ('django.contrib.auth.backends.ModelBackend'),
 )
+
+SIMPLE_JWT = {
+    # Устанавливаем срок жизни токена
+#    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+} 
