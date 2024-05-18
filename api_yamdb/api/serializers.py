@@ -156,7 +156,24 @@ class TitleCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = '__all__'
+
+    def to_representation(self, instance):
+        """Метод для определения формата вывода данных."""
+        request = self.context.get('request')
+        if request and request.method in ['POST', 'PUT'] and request.user.is_staff:
+            return {
+                'id': instance.id,
+                'name': instance.name,
+                'year': instance.year,
+                'rating': instance.rating,
+                'description': instance.description,
+                'genre': GenreSerializer(instance.genre, many=True).data,
+                'category': CategorySerializer(instance.category).data
+            }
         
+        # Возвращаем ожидаемый формат данных для обычных запросов
+        return super().to_representation(instance)
+
 
 
 class TitleReciveSerializer(serializers.ModelSerializer):
