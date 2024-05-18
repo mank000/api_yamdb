@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from reviews.const import (
+from api_yamdb.const import (
     DEFAULT_LENGTH_TEXT,
     MAX_LEN_NAME_SIZE,
     MAX_SCORE_VALUE,
