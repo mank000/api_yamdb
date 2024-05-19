@@ -4,7 +4,6 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from reviews.models import (
     Category,
@@ -45,26 +44,12 @@ class UserWithoutTokenSerializer(serializers.ModelSerializer):
             username=username)
 
         existing_user_email = YamdbUser.objects.filter(
-            email=email)
+            email=email
+        )
 
-        if (existing_user_username
-            and (existing_user_username.first().username
-                 == username)
-                and (existing_user_username.first().email
-                     != email)):
-            raise ValidationError(
-                {"username": "Пользователь с таким email уже существует"})
+        if existing_user_username.first() != existing_user_email.first():
+            raise ValidationError({"email": "этот Email занят"})
 
-        if (existing_user_email.exists()
-                and not existing_user_username.exists()):
-            raise ValidationError(
-                {"email": "Пользователь с таким username уже существует"}
-            )
-
-        if (existing_user_email.first() != existing_user_username.first()):
-            raise ValidationError(
-                {"Пользователь": "С такими данными существует"}
-            )
         return data
 
 
@@ -89,12 +74,10 @@ class UserTokenSerializer(serializers.ModelSerializer):
             YamdbUser,
             username=data.get("username")
         )
-        if user.confirmation_code == data.get("confirmation_code"):
-            refresh = RefreshToken.for_user(user)
-            user.confirmation_code = ''
-            user.save()
-            return {"token": str(refresh.access_token)}
-        raise ValidationError({'error': 'Неправильный код!'})
+        if user.confirmation_code != data.get("confirmation_code"):
+            raise ValidationError({'error': 'Неправильный код!'})
+        
+        return data
 
 
 class UsersSerializer(serializers.ModelSerializer):
