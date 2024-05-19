@@ -9,8 +9,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from reviews.models import Category, Genre, Review, Title
-from users.models import YamdbUser
 
 from api.filters import TitleFilter
 from api.mixins import ModelMixinSet
@@ -34,6 +32,8 @@ from api.utils import (
     make_confirmation_code,
     send_to_email
 )
+from reviews.models import Category, Genre, Review, Title
+from users.models import YamdbUser
 
 
 class SignView(APIView):
@@ -52,17 +52,10 @@ class SignView(APIView):
         )
 
         if existing_user.exists():
-            confirmation_code = make_confirmation_code()
-            existing_user.first().confirmation_code = confirmation_code
-            sended = send_to_email(
-                serializer.validated_data.get("email"),
-                confirmation_code
-            )
-            existing_user.first().save()
-            return Response(serializer.data,
-                            status=status.HTTP_200_OK)
+            user = existing_user.first()
+        else:
+            user = serializer.save()
 
-        user = serializer.save()
         confirmation_code = make_confirmation_code()
         user.confirmation_code = confirmation_code
         sended = send_to_email(
