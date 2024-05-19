@@ -1,9 +1,8 @@
 import random
 import string
 
-from django.core.mail import send_mail
-
 from django.conf import settings
+from django.core.mail import send_mail
 
 
 def make_confirmation_code():
