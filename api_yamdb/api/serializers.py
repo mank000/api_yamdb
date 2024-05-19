@@ -13,9 +13,11 @@ from reviews.models import (
     Review,
     Title
 )
-from users.models import YamdbUser
 
 from api_yamdb.const import MAX_LENGTH_EMAIL, MAX_LENGTH_USERNAME
+
+from users.models import YamdbUser
+
 
 User = get_user_model()
 
@@ -76,7 +78,7 @@ class UserTokenSerializer(serializers.ModelSerializer):
         )
         if user.confirmation_code != data.get("confirmation_code"):
             raise ValidationError({'error': 'Неправильный код!'})
-        
+
         return data
 
 

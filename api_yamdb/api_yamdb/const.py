@@ -10,9 +10,7 @@ MAX_LENGTH_EMAIL = 254
 MAX_LENGTH_ROLE = 20
 MAX_LENGTH_CONFCODE = 6
 BLOCKED_WORD = "me"
-ROLE_CHOICES = [
-    "admin",
-    "user",
-    "moderator",
-    "super_admin",
-]
+ADMIN_ROLE = "admin"
+USER_ROLE = "user"
+MODERATOR_ROLE = "moderator"
+SUPER_ADMIN_ROLE = "super_admin"

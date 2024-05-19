@@ -42,15 +42,15 @@ class SignView(APIView):
         serializer = UserWithoutTokenSerializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)
-        
+
         username = serializer.validated_data.get("username")
         email = serializer.validated_data.get("email")
-        
+
         existing_user = YamdbUser.objects.filter(
             username=username,
             email=email
         )
-        
+
         if existing_user.exists():
             confirmation_code = make_confirmation_code()
             existing_user.first().confirmation_code = confirmation_code

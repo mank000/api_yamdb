@@ -9,5 +9,12 @@ class YamdbUserAdmin(UserAdmin):
         ('Дополнительная информация', {'fields': ('role', 'bio')}),
     )
 
+    list_display = ('username', 'email',
+                    'first_name', 'last_name', 'role', 'is_staff')
+
+    list_editable = ('role',)
+
+    list_display_links = ('username', 'email')
+
 
 admin.site.register(YamdbUser, YamdbUserAdmin)
