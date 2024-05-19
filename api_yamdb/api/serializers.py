@@ -15,7 +15,7 @@ from reviews.models import (
 )
 from users.models import YamdbUser
 
-from api.const import MAX_LENGTH_EMAIL, MAX_LENGTH_USERNAME
+from api_yamdb.const import MAX_LENGTH_EMAIL, MAX_LENGTH_USERNAME
 
 User = get_user_model()
 
@@ -161,7 +161,7 @@ class TitleReciveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = (
-            'id', 'name', 'year', 'rating', 'description', "genre", "category",
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category',
         )
         read_only_fields = (
             'id', 'name', 'year', 'rating', 'description',
@@ -173,7 +173,7 @@ class GenreTitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GenreTitle
-        fields = ("id", "genre", "title")
+        fields = ('id', 'genre', 'title')
 
 
 class ReviewSerializer(serializers.ModelSerializer):
