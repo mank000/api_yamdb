@@ -4,7 +4,6 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from reviews.models import (
     Category,
@@ -14,9 +13,11 @@ from reviews.models import (
     Review,
     Title
 )
+
+from api_yamdb.const import MAX_LENGTH_EMAIL, MAX_LENGTH_USERNAME
+
 from users.models import YamdbUser
 
-from api.const import MAX_LENGTH_EMAIL, MAX_LENGTH_USERNAME
 
 User = get_user_model()
 
@@ -45,26 +46,12 @@ class UserWithoutTokenSerializer(serializers.ModelSerializer):
             username=username)
 
         existing_user_email = YamdbUser.objects.filter(
-            email=email)
+            email=email
+        )
 
-        if (existing_user_username
-            and (existing_user_username.first().username
-                 == username)
-                and (existing_user_username.first().email
-                     != email)):
-            raise ValidationError(
-                {"username": "Пользователь с таким email уже существует"})
+        if existing_user_username.first() != existing_user_email.first():
+            raise ValidationError({"email": "этот Email занят"})
 
-        if (existing_user_email.exists()
-                and not existing_user_username.exists()):
-            raise ValidationError(
-                {"email": "Пользователь с таким username уже существует"}
-            )
-
-        if (existing_user_email.first() != existing_user_username.first()):
-            raise ValidationError(
-                {"Пользователь": "С такими данными существует"}
-            )
         return data
 
 
@@ -89,12 +76,10 @@ class UserTokenSerializer(serializers.ModelSerializer):
             YamdbUser,
             username=data.get("username")
         )
-        if user.confirmation_code == data.get("confirmation_code"):
-            refresh = RefreshToken.for_user(user)
-            user.confirmation_code = ''
-            user.save()
-            return {"token": refresh.access_token}
-        raise ValidationError({'error': 'Неправильный код!'})
+        if user.confirmation_code != data.get("confirmation_code"):
+            raise ValidationError({'error': 'Неправильный код!'})
+
+        return data
 
 
 class UsersSerializer(serializers.ModelSerializer):
@@ -150,13 +135,17 @@ class TitleCreateSerializer(serializers.ModelSerializer):
         many=True,
         required=True,
         allow_null=False,
+        allow_empty=False
     )
 
     class Meta:
         model = Title
-        fields = (
-            '__all__'
-        )
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        """Метод для определения формата вывода данных."""
+        serializers = TitleReciveSerializer(instance)
+        return serializers.data
 
 
 class TitleReciveSerializer(serializers.ModelSerializer):
@@ -169,28 +158,17 @@ class TitleReciveSerializer(serializers.ModelSerializer):
         many=True,
         read_only=True,
     )
-    rating = serializers.IntegerField()
+    rating = serializers.IntegerField(default=0)
 
     class Meta:
         model = Title
-        fields = ("__all__")
+        fields = (
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category',
+        )
         read_only_fields = (
             'id', 'name', 'year', 'rating', 'description',
         )
 
-    def to_representation(self, instance):
-        """Метод для определения формата вывода данных."""
-        request = self.context.get('request')
-        if request or 'title_id' in request.query_params:
-            return {
-                'id': instance.id,
-                'name': instance.name,
-                'year': instance.year,
-                'rating': instance.rating,
-                'description': instance.description,
-                'genre': GenreSerializer(instance.genre, many=True).data,
-                'category': CategorySerializer(instance.category).data
-            }
 
 
 class GenreTitleSerializer(serializers.ModelSerializer):
@@ -198,7 +176,7 @@ class GenreTitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GenreTitle
-        fields = ("id", "genre", "title")
+        fields = ('id', 'genre', 'title')
 
 
 class ReviewSerializer(serializers.ModelSerializer):

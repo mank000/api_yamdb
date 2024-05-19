@@ -117,3 +117,7 @@ STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 AUTHENTICATION_BACKENDS = (
     ('django.contrib.auth.backends.ModelBackend'),
 )
+
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}

@@ -3,7 +3,7 @@ import string
 
 from django.core.mail import send_mail
 
-from api_yamdb.settings import EMAIL_ADRESS, EMAIL_HEAD_LETTER
+from django.conf import settings
 
 
 def make_confirmation_code():
@@ -15,9 +15,9 @@ def make_confirmation_code():
 def send_to_email(email, code):
     """Отправляет письмо с кодом подтверждения."""
     return send_mail(
-        EMAIL_HEAD_LETTER,
+        settings.EMAIL_HEAD_LETTER,
         code,
-        EMAIL_ADRESS,
+        settings.EMAIL_ADRESS,
         [email],
         fail_silently=False,
     )

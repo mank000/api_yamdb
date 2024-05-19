@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-from reviews.const import (
+from api_yamdb.const import (
     DEFAULT_LENGTH_TEXT,
     MAX_LEN_NAME_SIZE,
     MAX_SCORE_VALUE,
@@ -60,7 +60,7 @@ class CommentReviewModel(models.Model):
 class Category(CategoryGenreModel):
     """Класс категорий."""
 
-    class Meta:
+    class Meta(CategoryGenreModel.Meta):
         verbose_name = "категория"
         verbose_name_plural = "Категории"
 
@@ -68,7 +68,7 @@ class Category(CategoryGenreModel):
 class Genre(CategoryGenreModel):
     """Класс жанров."""
 
-    class Meta:
+    class Meta(CategoryGenreModel.Meta):
         verbose_name = "жанр"
         verbose_name_plural = "Жанры"
 
@@ -152,7 +152,7 @@ class Review(CommentReviewModel):
         null=True,
     )
 
-    class Meta:
+    class Meta(CommentReviewModel.Meta):
         verbose_name = "отзыв"
         verbose_name_plural = "Отзывы"
         constraints = (
@@ -173,6 +173,6 @@ class Comment(CommentReviewModel):
         verbose_name="oтзыв",
     )
 
-    class Meta:
+    class Meta(CommentReviewModel.Meta):
         verbose_name = "комментарий"
         verbose_name_plural = "Комментарии"
