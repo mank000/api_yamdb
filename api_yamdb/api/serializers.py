@@ -170,7 +170,6 @@ class TitleReciveSerializer(serializers.ModelSerializer):
         )
 
 
-
 class GenreTitleSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Соответствия жанра и произведения."""
 
